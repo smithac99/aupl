@@ -11,6 +11,10 @@
 		E74CA8C123985BB10009E8FD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E74CA8C023985BB10009E8FD /* Assets.xcassets */; };
 		E74CA8C423985BB10009E8FD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E74CA8C223985BB10009E8FD /* MainMenu.xib */; };
 		E74CA8C723985BB10009E8FD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E74CA8C623985BB10009E8FD /* main.m */; };
+		E74CA8D023AEA1400009E8FD /* DBSQL.m in Sources */ = {isa = PBXBuildFile; fileRef = E74CA8CE23AEA1400009E8FD /* DBSQL.m */; };
+		E74CA8D223AEAB0D0009E8FD /* tables.ddl in Resources */ = {isa = PBXBuildFile; fileRef = E74CA8D123AEAB0D0009E8FD /* tables.ddl */; };
+		E74CA8D523AEB2B30009E8FD /* NSString+OBAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = E74CA8D423AEB2B30009E8FD /* NSString+OBAdditions.m */; };
+		E74CA8D823B3D6F60009E8FD /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E74CA8D723B3D6F60009E8FD /* libsqlite3.0.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +26,12 @@
 		E74CA8C523985BB10009E8FD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E74CA8C623985BB10009E8FD /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E74CA8C823985BB10009E8FD /* aupl.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = aupl.entitlements; sourceTree = "<group>"; };
+		E74CA8CE23AEA1400009E8FD /* DBSQL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DBSQL.m; sourceTree = "<group>"; };
+		E74CA8CF23AEA1400009E8FD /* DBSQL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DBSQL.h; sourceTree = "<group>"; };
+		E74CA8D123AEAB0D0009E8FD /* tables.ddl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = tables.ddl; sourceTree = "<group>"; };
+		E74CA8D323AEB2B20009E8FD /* NSString+OBAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+OBAdditions.h"; sourceTree = "<group>"; };
+		E74CA8D423AEB2B30009E8FD /* NSString+OBAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+OBAdditions.m"; sourceTree = "<group>"; };
+		E74CA8D723B3D6F60009E8FD /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E74CA8D823B3D6F60009E8FD /* libsqlite3.0.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,6 +51,7 @@
 			children = (
 				E74CA8BC23985BAD0009E8FD /* aupl */,
 				E74CA8BB23985BAD0009E8FD /* Products */,
+				E74CA8D623B3D6F50009E8FD /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -56,13 +68,26 @@
 			children = (
 				E74CA8BD23985BAD0009E8FD /* AppDelegate.h */,
 				E74CA8BE23985BAD0009E8FD /* AppDelegate.m */,
+				E74CA8CF23AEA1400009E8FD /* DBSQL.h */,
+				E74CA8CE23AEA1400009E8FD /* DBSQL.m */,
+				E74CA8D123AEAB0D0009E8FD /* tables.ddl */,
 				E74CA8C023985BB10009E8FD /* Assets.xcassets */,
 				E74CA8C223985BB10009E8FD /* MainMenu.xib */,
 				E74CA8C523985BB10009E8FD /* Info.plist */,
+				E74CA8D323AEB2B20009E8FD /* NSString+OBAdditions.h */,
+				E74CA8D423AEB2B30009E8FD /* NSString+OBAdditions.m */,
 				E74CA8C623985BB10009E8FD /* main.m */,
 				E74CA8C823985BB10009E8FD /* aupl.entitlements */,
 			);
 			path = aupl;
+			sourceTree = "<group>";
+		};
+		E74CA8D623B3D6F50009E8FD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E74CA8D723B3D6F60009E8FD /* libsqlite3.0.tbd */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -96,6 +121,11 @@
 				TargetAttributes = {
 					E74CA8B923985BAD0009E8FD = {
 						CreatedOnToolsVersion = 10.3;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
 					};
 				};
 			};
@@ -123,6 +153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E74CA8C123985BB10009E8FD /* Assets.xcassets in Resources */,
+				E74CA8D223AEAB0D0009E8FD /* tables.ddl in Resources */,
 				E74CA8C423985BB10009E8FD /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -134,6 +165,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E74CA8D523AEB2B30009E8FD /* NSString+OBAdditions.m in Sources */,
+				E74CA8D023AEA1400009E8FD /* DBSQL.m in Sources */,
 				E74CA8C723985BB10009E8FD /* main.m in Sources */,
 				E74CA8BF23985BAD0009E8FD /* AppDelegate.m in Sources */,
 			);
@@ -268,7 +301,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = aupl/aupl.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 73G67QZ25Y;
@@ -286,7 +318,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = aupl/aupl.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 73G67QZ25Y;
