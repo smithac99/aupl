@@ -14,17 +14,17 @@ dispatch_queue_t dbQueue;
 
 void DoOnDatabaseQueue(void (^block)(void))
 {
-//    dispatch_sync(dbQueue, ^{
+    dispatch_sync(dbQueue, ^{
         block();
-//    });
+    });
 }
 
 void DoOnDatabase(void (^block)(DBSQL *db))
 {
-//    dispatch_sync(dbQueue, ^{
+    dispatch_sync(dbQueue, ^{
         DBSQL *db = Database();
         block(db);
-//    });
+    });
 }
 
 
@@ -93,7 +93,7 @@ BOOL IsLong(NSNumber *n)
 {
 	if ((self = [super init]))
 	{
-        //dbQueue = dispatch_queue_create("org.onebillion.dbqueue", NULL);
+        dbQueue = dispatch_queue_create("org.onebillion.dbqueue", NULL);
 		self.dbFileName = fn;
 		self.dbPath = fn;
 		self.tableName = nil;

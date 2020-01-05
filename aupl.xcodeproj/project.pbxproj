@@ -15,6 +15,9 @@
 		E74CA8D223AEAB0D0009E8FD /* tables.ddl in Resources */ = {isa = PBXBuildFile; fileRef = E74CA8D123AEAB0D0009E8FD /* tables.ddl */; };
 		E74CA8D523AEB2B30009E8FD /* NSString+OBAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = E74CA8D423AEB2B30009E8FD /* NSString+OBAdditions.m */; };
 		E74CA8D823B3D6F60009E8FD /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E74CA8D723B3D6F60009E8FD /* libsqlite3.0.tbd */; };
+		E7BC5CC323BB863C002AC4F8 /* AuPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = E7BC5CC223BB863C002AC4F8 /* AuPlayer.m */; };
+		E7BC5CC623BBE9E3002AC4F8 /* PlayQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = E7BC5CC523BBE9E2002AC4F8 /* PlayQueue.m */; };
+		E7BC5CC923C0FC20002AC4F8 /* EventView.m in Sources */ = {isa = PBXBuildFile; fileRef = E7BC5CC823C0FC20002AC4F8 /* EventView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +35,12 @@
 		E74CA8D323AEB2B20009E8FD /* NSString+OBAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+OBAdditions.h"; sourceTree = "<group>"; };
 		E74CA8D423AEB2B30009E8FD /* NSString+OBAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+OBAdditions.m"; sourceTree = "<group>"; };
 		E74CA8D723B3D6F60009E8FD /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
+		E7BC5CC123BB863C002AC4F8 /* AuPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AuPlayer.h; sourceTree = "<group>"; };
+		E7BC5CC223BB863C002AC4F8 /* AuPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AuPlayer.m; sourceTree = "<group>"; };
+		E7BC5CC423BBE9E2002AC4F8 /* PlayQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayQueue.h; sourceTree = "<group>"; };
+		E7BC5CC523BBE9E2002AC4F8 /* PlayQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlayQueue.m; sourceTree = "<group>"; };
+		E7BC5CC723C0FC20002AC4F8 /* EventView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EventView.h; sourceTree = "<group>"; };
+		E7BC5CC823C0FC20002AC4F8 /* EventView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EventView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +79,12 @@
 				E74CA8BE23985BAD0009E8FD /* AppDelegate.m */,
 				E74CA8CF23AEA1400009E8FD /* DBSQL.h */,
 				E74CA8CE23AEA1400009E8FD /* DBSQL.m */,
+				E7BC5CC123BB863C002AC4F8 /* AuPlayer.h */,
+				E7BC5CC223BB863C002AC4F8 /* AuPlayer.m */,
+				E7BC5CC423BBE9E2002AC4F8 /* PlayQueue.h */,
+				E7BC5CC523BBE9E2002AC4F8 /* PlayQueue.m */,
+				E7BC5CC723C0FC20002AC4F8 /* EventView.h */,
+				E7BC5CC823C0FC20002AC4F8 /* EventView.m */,
 				E74CA8D123AEAB0D0009E8FD /* tables.ddl */,
 				E74CA8C023985BB10009E8FD /* Assets.xcassets */,
 				E74CA8C223985BB10009E8FD /* MainMenu.xib */,
@@ -165,8 +180,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7BC5CC923C0FC20002AC4F8 /* EventView.m in Sources */,
 				E74CA8D523AEB2B30009E8FD /* NSString+OBAdditions.m in Sources */,
+				E7BC5CC623BBE9E3002AC4F8 /* PlayQueue.m in Sources */,
 				E74CA8D023AEA1400009E8FD /* DBSQL.m in Sources */,
+				E7BC5CC323BB863C002AC4F8 /* AuPlayer.m in Sources */,
 				E74CA8C723985BB10009E8FD /* main.m in Sources */,
 				E74CA8BF23985BAD0009E8FD /* AppDelegate.m in Sources */,
 			);
@@ -301,9 +319,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 73G67QZ25Y;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = aupl/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -318,9 +337,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 73G67QZ25Y;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = aupl/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

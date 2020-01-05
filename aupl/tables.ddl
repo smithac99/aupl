@@ -6,17 +6,22 @@ create table tracks
 	relPath text not null,
     artist text,
 	track text,
+    trackNumber int,
+    discNumber int not null default 1,
+    durationSecs int,
 	album text,
 	lastPlayed big unsigned int not null default 0,
 	timesPlayed int not null default 0
 );
 create unique index relPath_index ON tracks(relPath);
 //
-create unique index artist_index ON tracks(artist,idx);
+create unique index artist_index ON tracks(artist,album,trackNumber,idx);
 //
 create unique index track_index ON tracks(track,idx);
 //
-create unique index album_index ON tracks(album,idx);
+create unique index album_index ON tracks(album,discNumber,trackNumber,idx);
 //
 create unique index lastPlayed_index ON tracks(lastPlayed,idx);
+//
+create unique index timesPlayed_index ON tracks(timesPlayed,idx);
 //

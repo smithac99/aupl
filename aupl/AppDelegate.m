@@ -16,13 +16,14 @@ NSString *retrievableColumns;
 @interface AppDelegate ()
 @property NSString *sortColumn;
 @property (weak) IBOutlet NSWindow *window;
+@property (weak) IBOutlet NSButton *playPauseButton;
 @end
 
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	orderableColumns = @[@"artist",@"album",@"track",@"lastPlayed",@"timesPlayed",@"idx"];
+	orderableColumns = @[@"artist",@"album",@"trackNumber",@"track",@"lastPlayed",@"timesPlayed",@"idx"];
 	self.sortColumn = orderableColumns[0];
 	retrievableColumns = @"idx,relPath,artist,track,album,lastPlayed,timesPlayed";
 	self.directorySearchQueue = [NSMutableArray array];
@@ -47,23 +48,31 @@ NSString *retrievableColumns;
 	return [pc componentsJoinedByString:@"/"];
 }
 
+-(NSString*)fullPathForRelPath:(NSString*)relPath
+{
+    NSString *f = [self.rootURL path];
+    return [f stringByAppendingPathComponent:relPath];
+}
+
 -(void)tryReplaceFilePath:(NSString*)relPath row:(NSDictionary*)restOfRow
 {
 	
 }
 
--(void)tryInsertFilePath:(NSString*)filePath artist:(NSString*)artist track:(NSString*)track album:(NSString*)album
+-(void)tryInsertFilePath:(NSString*)filePath artist:(NSString*)artist track:(NSString*)track album:(NSString*)album trackNo:(NSInteger)trackNo discNo:(NSInteger)discNo
 {
 	NSString *relpath = [self pathRelativeToBase:filePath];
 	if (artist == nil || track == nil || album == nil)
+    {
 		NSLog(@"nils for %@",relpath);
+    }
 	if (artist == nil)
 		artist = @"";
 	if (track == nil)
 		track = @"";
 	if (album == nil)
 		album = @"";
-	NSString *qs = @"select idx,artist,track,album from tracks where relPath = ? ";
+	NSString *qs = @"select idx,artist,track,album,discNumber,trackNumber from tracks where relPath = ? ";
 	sqlite3_stmt *stmt = [self.db prepareQuery:qs withParams:@[relpath]];
 	NSDictionary *row = [self.db getRow:stmt];
 	[self.db closeStatement:stmt];
@@ -71,14 +80,66 @@ NSString *retrievableColumns;
 		[self tryReplaceFilePath:relpath row:row];
 	else
 	{
-		NSString *is = @"insert into tracks(relPath,artist,track,album) values(?,?,?,?)";
+        NSString *is1 = [NSString stringWithFormat:@"insert into tracks(relPath,artist,track,album,trackNumber%@)",discNo>0?@",discNumber":@""];
+        NSString *is2 = [NSString stringWithFormat:@" values(?,?,?,?,?%@)",discNo>0?@",?":@""];
 		//[self.db beginTransaction];
-		[self.db doQuery:is parameters:@[relpath,artist,track,album]];
+        NSMutableArray *pars = [NSMutableArray arrayWithArray:@[relpath,artist,track,album,@(trackNo)]];
+        if (discNo > 0)
+            [pars addObject:@(discNo)];
+		[self.db doQuery:[is1 stringByAppendingString:is2] parameters:pars];
 		//[self.db commitTransaction];
 	}
 }
+
+-(NSDictionary<NSString*,NSNumber*>*)discAndTrackNoPrefixOfString:(NSString*)s
+{
+    NSInteger idx = 0;
+    unichar c = [s characterAtIndex:idx];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    NSMutableArray *arr = [NSMutableArray array];
+    NSInteger n = 0;
+    while (idx < [s length] && (isnumber(c) || c == '-'))
+    {
+        if (c == '-')
+        {
+            [arr addObject:@(n)];
+            n = 0;
+        }
+        else
+        {
+            n = n * 10 + (c - '0');
+        }
+        idx++;
+        if (idx < [s length])
+            c = [s characterAtIndex:idx];
+        else
+            c = 0;
+    }
+    dict[@"trk"] = @(n);
+    NSInteger disk = 1;
+    if ([arr count] > 0)
+        disk = [arr[0] integerValue];
+    dict[@"disk"] = @(disk);
+    dict[@"idx"] = @(idx);
+    return dict;
+}
+-(NSInteger)numberPrefixOfString:(NSString*)s
+{
+    NSInteger idx = [s rangeOfString:@" "].location;
+    if (idx == 2)
+    {
+        unichar c0 = [s characterAtIndex:0];
+        unichar c1 = [s characterAtIndex:1];
+        if (isnumber(c0) && isnumber(c1))
+        {
+            return (c0 - '0') * 10 + (c1 - '0');
+        }
+    }
+    return -1;
+}
 -(void)processFile:(NSString*)filePath
 {
+    NSLog(@"%@",filePath);
 	NSURL *url = [NSURL fileURLWithPath:filePath];
 	NSString *type = nil;
 	NSError *err = nil;
@@ -91,22 +152,43 @@ NSString *retrievableColumns;
 			NSArray *artworks = [AVMetadataItem metadataItemsFromArray:asset.commonMetadata withKey:AVMetadataCommonKeyArtwork keySpace:AVMetadataKeySpaceCommon];
 			NSArray *titles = [AVMetadataItem metadataItemsFromArray:asset.commonMetadata withKey:AVMetadataCommonKeyTitle keySpace:AVMetadataKeySpaceCommon];
 			NSArray *artists = [AVMetadataItem metadataItemsFromArray:asset.commonMetadata withKey:AVMetadataCommonKeyArtist keySpace:AVMetadataKeySpaceCommon];
-			NSArray *albumNames = [AVMetadataItem metadataItemsFromArray:asset.commonMetadata withKey:AVMetadataCommonKeyAlbumName keySpace:AVMetadataKeySpaceCommon];
-			
+            NSArray *albumNames = [AVMetadataItem metadataItemsFromArray:asset.commonMetadata withKey:AVMetadataCommonKeyAlbumName keySpace:AVMetadataKeySpaceCommon];
+            NSArray *trackNumbers = [AVMetadataItem metadataItemsFromArray:asset.metadata withKey:AVMetadataiTunesMetadataKeyTrackNumber keySpace:AVMetadataKeySpaceiTunes];
+
 			//AVMetadataItem *artwork = [artworks objectAtIndex:0];
 			AVMetadataItem *title = [titles firstObject];
 			AVMetadataItem *artist = [artists firstObject];
-			AVMetadataItem *albumName = [albumNames firstObject];
+            AVMetadataItem *albumName = [albumNames firstObject];
+            //AVMetadataItem *trackNo = [trackNumbers firstObject];
+            NSString *filename = [[filePath lastPathComponent]stringByDeletingPathExtension];
+            NSDictionary *dtdict = [self discAndTrackNoPrefixOfString:filename];
+            NSInteger trackno = [dtdict[@"trk"]integerValue];
+            NSInteger discno = [dtdict[@"disk"]integerValue];
+            NSInteger namest = [dtdict[@"idx"]integerValue];
+            //NSInteger trackno = [self numberPrefixOfString:filename];
+            filename = [filename substringFromIndex:namest + 1];
+            if ([filename hasPrefix:@" "])
+            filename = [filename substringFromIndex:namest + 1];
+            NSString *titleString = (NSString*)(title.value);
+            if (titleString == nil)
+            {
+                titleString = filename;
+            }
+            if (artist.value == nil || title.value == nil || albumName.value == nil)
+            {
+                NSLog(@"%@",[asset metadata]);
+            }
+
 			DoOnDatabaseQueue(^{
-				[self tryInsertFilePath:filePath artist:artist.value track:title.value album:albumName.value];
+                [self tryInsertFilePath:filePath artist:artist.value track:titleString album:albumName.value trackNo:trackno discNo:discno];
 			});
 		}
 	}
 }
--(void)processQueue
+-(void)processQueue:(int)ct
 {
 	int isrtCount = 0;
-	while ([self.directorySearchQueue count] > 0)
+	while ([self.directorySearchQueue count] > 0 && isrtCount < 100)
 	{
 		NSString* dirPath = [self.directorySearchQueue firstObject];
 		[self.directorySearchQueue removeObjectAtIndex:0];
@@ -134,8 +216,16 @@ NSString *retrievableColumns;
 		}
 	}
 	[self refresh:AD_REFRESH_IF_ROW_COUNT_CHANGED];
+    if (ct > 0)
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [self processQueue:ct - 1];
+        });
 }
 
+-(void)processQueue
+{
+    [self processQueue:10];
+}
 -(void)openDB
 {
 	if(self.rootURL)
@@ -145,9 +235,9 @@ NSString *retrievableColumns;
 		self.db = Database();
 	}
 	[self.directorySearchQueue addObject:[self.rootURL path]];
-	//dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-	[self processQueue];
-	//});
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self processQueue];
+	});
 }
 
 -(void)chooseRootDirectoryStartAt:(NSURL*)url
@@ -206,11 +296,16 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 	return nil;
 }
 
--(void)retrieveIndices
+-(void)retrieveIndicesSearch:(NSString*)search
 {
-	NSString *st = @"select idx from tracks order by ";
+	NSString *st = @"select idx from tracks ";
+    NSString *searchString = @"";
+    if ([search length] > 0)
+    {
+        searchString = [NSString stringWithFormat:@"where artist like \"%%%%%@%%%%\" or album like \"%%%%%@%%%%\" or track like \"%%%%%@%%%%\"",search,search,search ] ;
+    }
 	NSString *orderString = [[self columnsOrderBy:self.sortColumn]componentsJoinedByString:@","];
-	NSString *qs = [NSString stringWithFormat:@"%@%@",st,orderString];
+	NSString *qs = [NSString stringWithFormat:@"%@ %@ order by %@",st,searchString,orderString];
 	sqlite3_stmt *stmt = [self.db prepareQuery:qs withParams:@[]];
 	NSDictionary *row = [self.db getRow:stmt];
 	while (row)
@@ -230,8 +325,12 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 	if (tablect != [_entryList count])
 	{
 		[_entryList removeAllObjects];
-		[self retrieveIndices];
-		[self.mainTableView reloadData];
+        DoOnDatabase(^(DBSQL *db) {
+            [self retrieveIndicesSearch:nil];
+        });
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.mainTableView reloadData];
+        });
 	}
 }
 
@@ -239,7 +338,9 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 {
 	if (_entryCache[@(idx)] == nil)
 	{
-		[self retrieveRowForIdx:idx];
+        DoOnDatabase(^(DBSQL *db) {
+            [self retrieveRowForIdx:idx];
+        });
 	}
 	return _entryCache[@(idx)];
 }
@@ -263,4 +364,46 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 	return 0;
 }
 
+#pragma mark -
+
+-(NSArray*)trackIndexesToPlay
+{
+    NSIndexSet *ixs = [_mainTableView selectedRowIndexes];
+    return [_entryList objectsAtIndexes:ixs];
+}
+
+- (IBAction)playPauseHit:(id)sender
+{
+    if (!_isPlaying)
+    {
+        if ([_playqueue queueEmpty])
+            [_playqueue buildQueueFrom:[self trackIndexesToPlay]];
+        else
+            [_playqueue play];
+        [self setIsPlaying:YES];
+    }
+    else
+    {
+        [_playqueue pause];
+        [self setIsPlaying:NO];
+    }
+}
+
+- (IBAction)nextHit:(id)sender
+{
+    [_playqueue goToNext];
+}
+- (IBAction)prevHit:(id)sender {
+}
+
+- (void)controlTextDidChange:(NSNotification *)obj
+{
+    
+}
+- (IBAction)searchHit:(id)sender
+{
+    [_entryList removeAllObjects];
+    [self retrieveIndicesSearch:[sender stringValue]];
+    [_mainTableView reloadData];
+}
 @end
