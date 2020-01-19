@@ -10,6 +10,8 @@
 #import "DBSQL.h"
 #import "PlayQueue.h"
 
+extern NSString *AUPL_PLAY_CHANGED;
+
 enum
 {
 	AD_REFRESH_ALL_DATA = 1,
