@@ -490,6 +490,15 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 
 - (IBAction)playPauseHit:(id)sender
 {
+    NSUInteger modifierFlags = [[[_mainTableView window]currentEvent]modifierFlags];
+    if (modifierFlags & NSEventModifierFlagOption)
+    {
+        if (_playqueue.currentTrack && [[_playqueue player]isPlaying])
+        {
+            _playqueue.stopAtEndOfThisTrack = true;
+        }
+        return;
+    }
     if (!_isPlaying)
     {
         if (_playqueue.currentTrack == nil)

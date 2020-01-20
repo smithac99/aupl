@@ -24,6 +24,7 @@
 @property NSMutableArray *queue,*historyQueue;
 @property NSMutableDictionary *currentTrack;
 @property NSInteger minQueueSize;
+@property BOOL stopAtEndOfThisTrack;
 @property (weak) IBOutlet id<PlayQueueDelegate>delegate;
 -(void)play;
 -(void)stopAllPlay;
@@ -36,6 +37,7 @@
 -(BOOL)goToPrev;
 -(void)pause;
 -(BOOL)anyThingPlaying;
+-(AuPlayer*)player;
 
 @end
 

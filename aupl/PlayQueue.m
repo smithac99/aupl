@@ -55,6 +55,12 @@
     [self.timeSlider setIntValue:0];
 }
 
+-(AuPlayer*)player
+{
+    NSMutableDictionary *md = self.currentTrack;
+    return md[@"player"];
+
+}
 -(BOOL)anyThingPlaying
 {
     if (self.currentTrack == nil)
@@ -165,6 +171,18 @@
     }
 }
 
+-(void)moveCurrentToHistory
+{
+    NSMutableDictionary *md = self.currentTrack;
+    if (md)
+    {
+        AuPlayer *pl = md[@"player"];
+        [pl stopPlaying];
+        [md removeObjectForKey:@"player"];
+        [_historyQueue addObject:md];
+    }
+    self.currentTrack = nil;
+}
 -(BOOL)goToNext
 {
     if ([_queue count] < 1)
@@ -174,14 +192,7 @@
         return NO;
     }
     BOOL playing = [_delegate isPlaying];
-    NSMutableDictionary *md = self.currentTrack;
-    if (md)
-    {
-        AuPlayer *pl = md[@"player"];
-        [pl stopPlaying];
-        [md removeObjectForKey:@"player"];
-        [_historyQueue addObject:md];
-    }
+    [self moveCurrentToHistory];
     self.currentTrack = _queue[0];
     [_queue removeObjectAtIndex:0];
     if (playing)
@@ -234,11 +245,14 @@
 {
     if (self.currentTrack == nil)
         return;
-    NSMutableDictionary *md = self.currentTrack;
-    [md removeObjectForKey:@"player"];
-    [_historyQueue addObject:md];
-    self.currentTrack = nil;
-    [self goToNext];
+    if (!self.stopAtEndOfThisTrack)
+        [self goToNext];
+    else
+    {
+        [self moveCurrentToHistory];
+        self.stopAtEndOfThisTrack = NO;
+        [self notifyPlayStatusChange];
+    }
 }
 
 NSString *timePrint(NSTimeInterval secs)
