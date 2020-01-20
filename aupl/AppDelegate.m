@@ -21,6 +21,7 @@ NSString *retrievableColumns;
     NSInteger lastProvidedIndex;
 }
 @property NSString *sortColumn;
+@property BOOL sortDescending;
 @property (weak) IBOutlet NSWindow *window;
 @property (weak) IBOutlet NSButton *playPauseButton;
 @property (weak) IBOutlet NSTextField *trackCountLabel;
@@ -271,7 +272,7 @@ NSString *retrievableColumns;
 		NSString *path = [[self.rootURL path]stringByAppendingPathComponent:@"aupl"];
 		[DBSQL setupSingletonWithName:path andDBScriptName:@"tables"];
 		self.db = Database();
-        NSInteger rowct = [self refresh:0];
+        NSInteger rowct = [self refresh:AD_REFRESH_IF_ROW_COUNT_CHANGED];
         if (rowct == 0)
         {
             [self.directorySearchQueue addObject:[self.rootURL path]];
@@ -326,11 +327,14 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 -(NSArray*)columnsOrderBy:(NSString*)c1
 {
 	NSMutableArray *mcols = [orderableColumns mutableCopy];
-	if ([c1 isEqualToString:@"artist"])
-		return mcols;
-	NSInteger idx= [mcols indexOfObject:c1];
-	if (idx != NSNotFound)
-		swapidxes(mcols, 0,idx);
+	if (![c1 isEqualToString:@"artist"])
+	{
+        NSInteger idx= [mcols indexOfObject:c1];
+        if (idx != NSNotFound)
+            swapidxes(mcols, 0,idx);
+    }
+    if (self.sortDescending)
+        [mcols replaceObjectAtIndex:0 withObject:[mcols[0] stringByAppendingString:@" desc"]];
 	return mcols;
 }
 
@@ -375,22 +379,27 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 {
 	if (flags & AD_REFRESH_ALL_DATA)
 		[_entryCache removeAllObjects];
-    __block NSNumber *nrct;
-    DoOnDatabase(^(DBSQL *db) {
-         nrct = [self.db valueFromQuery:@"select count(*) from tracks"];
-    });
-	int tablect = [nrct intValue];
-	if (tablect != [_entryList count])
-	{
-		[_entryList removeAllObjects];
+    BOOL shouldFetch = ((flags & AD_REFRESH_ROW_ORDER) != 0);
+    if (!shouldFetch && (flags & AD_REFRESH_IF_ROW_COUNT_CHANGED))
+    {
+        __block NSNumber *nrct;
+        DoOnDatabase(^(DBSQL *db) {
+             nrct = [self.db valueFromQuery:@"select count(*) from tracks"];
+        });
+        int tablect = [nrct intValue];
+        shouldFetch = shouldFetch || tablect != [_entryList count];
+    }
+    if (shouldFetch)
+    {
+        [_entryList removeAllObjects];
         DoOnDatabase(^(DBSQL *db) {
             [self retrieveIndicesSearch:nil];
         });
-	}
+    }
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.mainTableView reloadData];
     });
-    return tablect;
+    return [_entryList count];
 }
 
 -(NSMutableDictionary*)trackForIdx:(NSInteger)idx
@@ -447,9 +456,27 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 
 - (void)tableView:(NSTableView *)tableView mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn
 {
-    self.sortColumn = [tableColumn identifier];
-    NSLog(self.sortColumn);
+//    self.sortColumn = [tableColumn identifier];
+    NSLog(@"mouseDown %@",[tableColumn identifier]);
     //[self refresh:0];
+}
+
+-(void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn
+{
+    NSLog(@"didClick %@",[tableColumn identifier]);
+    if ([self.sortColumn isEqualToString:[tableColumn identifier]])
+        self.sortDescending = !self.sortDescending;
+    else
+    {
+        self.sortDescending = NO;
+        self.sortColumn = [tableColumn identifier];
+    }
+    [self refresh:AD_REFRESH_ROW_ORDER];
+}
+
+- (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray *)oldDescriptors
+{
+    [tableView reloadData];
 }
 #pragma mark -
 
