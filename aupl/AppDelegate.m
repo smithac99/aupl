@@ -483,9 +483,16 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 
 -(NSArray*)trackIndexesToPlay
 {
-    NSIndexSet *ixs = [_mainTableView selectedRowIndexes];
-    if ([ixs count] > 0)
-        return [_entryList objectsAtIndexes:ixs];
+    NSIndexSet *selectedRows = [_mainTableView selectedRowIndexes];
+    NSInteger clickedRow = [_mainTableView clickedRow];
+    if (clickedRow == -1 || [selectedRows containsIndex:clickedRow])
+    {
+        return [_entryList objectsAtIndexes:selectedRows];
+    }
+    else
+    {
+        return [_entryList objectAtIndex:clickedRow];
+    }
     return @[@0];
 }
 

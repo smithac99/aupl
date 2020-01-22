@@ -4,12 +4,12 @@ create table tracks
 (
     idx integer primary key not null,
 	relPath text not null,
-    artist text,
-	track text,
+    artist text collate nocase,
+	track text collate nocase,
     trackNumber int,
     discNumber int not null default 1,
     durationSecs int,
-	album text,
+	album text collate nocase,
     lastPlayed big unsigned int not null default 0,
     created big unsigned int not null default 0,
 	timesPlayed int not null default 0
