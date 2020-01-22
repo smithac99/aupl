@@ -20,6 +20,7 @@
 @property (weak) IBOutlet NSSlider *timeSlider;
 @property (weak) IBOutlet NSTableView *queueTableView;
 
+@property (weak) IBOutlet NSTableView *historyTableView;
 
 @end
 
@@ -42,6 +43,8 @@
         inited = YES;
         _minQueueSize = 5;
         [self resetLabels];
+        self.volume = 1;
+        [self.volSlider setFloatValue:self.volume];
         [super awakeFromNib];
     }
 }
@@ -127,10 +130,17 @@
     NSMutableDictionary *md = self.currentTrack;
     NSInteger trackNumber = [md[@"trackno"]integerValue];
     NSString *fullPath = md[@"fullpath"];
-    AuPlayer *player = [[AuPlayer alloc]initWithTrackIndex:trackNumber];
-    player.delegate = self;
-    md[@"player"] = player;
-    [player startPlaying:fullPath volume:1.0];
+    AuPlayer *player = md[@"player"];
+    if (player == nil)
+    {
+        player = [[AuPlayer alloc]initWithTrackIndex:trackNumber];
+        player.delegate = self;
+        md[@"player"] = player;
+    }
+    [player setVolume:self.volume];
+    if ([player state] < AUP_PREPARED)
+        [player prepare:fullPath];
+    [player play];
     [self updateLabelsEtc];
     [self startPeriodicUpdates];
     NSTimeInterval dur = [player duration];
@@ -179,7 +189,8 @@
         AuPlayer *pl = md[@"player"];
         [pl stopPlaying];
         [md removeObjectForKey:@"player"];
-        [_historyQueue addObject:md];
+        [_historyQueue insertObject:md atIndex:0];
+        [_historyTableView reloadData];
     }
     self.currentTrack = nil;
 }
@@ -204,9 +215,32 @@
     return YES;
 }
 
+-(BOOL)goToPreviousTrack
+{
+    if ([_historyQueue count] > 0)
+    {
+        NSMutableDictionary *md = _historyQueue[0];
+        if (self.currentTrack)
+            [_queue insertObject:self.currentTrack atIndex:0];
+        self.currentTrack = md;
+        [self startPlayingCurrentTrack];
+        [_queueTableView reloadData];
+    }
+    return NO;
+}
+
 -(BOOL)goToPrev
 {
-    return YES;
+    if (self.currentTrack)
+    {
+        AuPlayer *pl = self.currentTrack[@"player"];
+        if ([pl time] > 3)
+        {
+            [pl setTime:0];
+            return YES;
+        }
+    }
+    return [self goToPreviousTrack];
 }
 -(void)buildQueueFrom:(NSArray*)trackNumbers
 {
@@ -320,10 +354,19 @@ NSString *timePrint(NSTimeInterval secs)
 
 #pragma mark -
 
+- (IBAction)volSliderHit:(id)sender
+{
+    self.volume = [sender floatValue];
+    [[NSUserDefaults standardUserDefaults]setFloat:self.volume forKey:@"volume"];
+    [[self player]setVolume:self.volume];
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == self.queueTableView)
         return [_queue count];
+    if (tableView == self.historyTableView)
+        return [_historyQueue count];
     return 0;
 }
 
@@ -333,6 +376,8 @@ NSString *timePrint(NSTimeInterval secs)
         return nil;
     if ([[tableColumn identifier]isEqual:@"queue"])
     {
+        if (rowIndex < 0 || rowIndex >= [_queue count])
+            return nil;
         NSView *v = [tableView makeViewWithIdentifier:@"queue" owner:self];
         NSTextField *songf = [v viewWithTag:2];
         NSMutableDictionary *md = _queue[rowIndex];
@@ -344,8 +389,41 @@ NSString *timePrint(NSTimeInterval secs)
         return v;
     }
 
+    if ([[tableColumn identifier]isEqual:@"history"])
+    {
+        if (rowIndex < 0 || rowIndex >= [_historyQueue count])
+            return nil;
+        NSView *v = [tableView makeViewWithIdentifier:@"history" owner:self];
+        NSTextField *songf = [v viewWithTag:2];
+        NSMutableDictionary *md = _historyQueue[rowIndex];
+        NSMutableDictionary *td = md[@"trackdict"];
+        [songf setStringValue:td[@"track"]];
+        NSString *artistalbum = [NSString stringWithFormat:@"%@ - %@",td[@"artist"],td[@"album"]];
+        [[v viewWithTag:3] setStringValue:artistalbum];
+        NSTextField *dt = [v viewWithTag:4];
+        NSTimeInterval st = [td[@"lastPlayed"]integerValue];
+        [dt setStringValue:[_delegate formattedDateAndTime:st]];
+        return v;
+    }
+
     return nil;
 
+}
+
+- (IBAction)removeQueueEntry:(id)sender
+{
+    NSIndexSet *selectedRows = [_queueTableView selectedRowIndexes];
+    NSInteger clickedRow = [_queueTableView clickedRow];
+    if (clickedRow == -1 || [selectedRows containsIndex:clickedRow])
+    {
+        [_queue removeObjectsAtIndexes:selectedRows];
+    }
+    else
+    {
+        [_queue removeObjectAtIndex:clickedRow];
+    }
+    [_queueTableView selectRowIndexes:[[NSIndexSet alloc]init] byExtendingSelection:NO];
+    [_queueTableView reloadData];
 }
 
 @end

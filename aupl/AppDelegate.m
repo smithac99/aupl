@@ -19,6 +19,7 @@ NSString *retrievableColumns;
 @interface AppDelegate ()
 {
     NSInteger lastProvidedIndex;
+    NSMutableArray *queuedTracks;
 }
 @property NSString *sortColumn;
 @property BOOL sortDescending;
@@ -488,6 +489,22 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
     return @[@0];
 }
 
+-(void)keepQueue
+{
+    if (![self isRandom] && [[NSUserDefaults standardUserDefaults]boolForKey:@"continue"])
+    {
+        NSInteger lastRow;
+        NSIndexSet *ixs = [_mainTableView selectedRowIndexes];
+        if ([ixs count] > 0)
+            lastRow = [ixs lastIndex];
+        else
+            lastRow = 0;
+        queuedTracks = [[_entryList subarrayWithRange:NSMakeRange(lastRow + 1, [_entryList count] - lastRow - 1)]mutableCopy];
+    }
+    else
+        queuedTracks = nil;
+
+}
 - (IBAction)playPauseHit:(id)sender
 {
     NSUInteger modifierFlags = [[[_mainTableView window]currentEvent]modifierFlags];
@@ -506,6 +523,7 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
             NSArray *ns = [self trackIndexesToPlay];
             [_playqueue buildQueueFrom:ns];
             lastProvidedIndex = [[ns lastObject]integerValue];
+            [self keepQueue];
             [self setIsPlaying:YES];
             [_playqueue goToNext];
         }
@@ -524,6 +542,7 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
     NSArray *ns = [self trackIndexesToPlay];
     [_playqueue buildQueueFrom:ns];
     lastProvidedIndex = [[ns lastObject]integerValue];
+    [self keepQueue];
     [self setIsPlaying:YES];
     [_playqueue goToNext];
 }
@@ -553,6 +572,7 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 }
 - (IBAction)prevHit:(id)sender
 {
+    [_playqueue goToPrev];
 }
 
 -(BOOL)isRandom
@@ -560,6 +580,17 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
     return [[NSUserDefaults standardUserDefaults]boolForKey:@"random"];
 }
 
+-(NSInteger)rowIndexFromTrackIndex:(NSInteger)idx
+{
+    NSInteger i = 0;
+    for (NSNumber *n in _entryList)
+    {
+        if ([n integerValue] == idx)
+            return i;
+        i++;
+    }
+    return -1;
+}
 -(NSArray*)getRandomTracks:(NSInteger)ct
 {
     NSMutableArray *arr = [NSMutableArray array];
@@ -587,7 +618,14 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
     }
     else
     {
-        
+        if ([queuedTracks count] > 0)
+        {
+            if ([queuedTracks count] < num)
+                num = [queuedTracks count];
+            NSArray *a = [queuedTracks subarrayWithRange:NSMakeRange(0, num)];
+            [queuedTracks removeObjectsInRange:NSMakeRange(0, num)];
+            return a;
+        }
     }
     return @[];
 }

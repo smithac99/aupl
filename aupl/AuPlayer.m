@@ -100,4 +100,11 @@
 {
     return self.player.currentTime;
 }
+
+-(void)setTime:(NSTimeInterval)tm
+{
+    self.player.currentTime = tm;
+}
+
+
 @end

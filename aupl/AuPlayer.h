@@ -42,6 +42,7 @@ enum
 -(void)stopPlaying;
 -(NSTimeInterval)duration;
 -(NSTimeInterval)time;
+-(void)setTime:(NSTimeInterval)tm;
 
 
 @end

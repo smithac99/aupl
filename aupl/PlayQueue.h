@@ -17,6 +17,7 @@
 -(BOOL)isPlaying;
 -(NSArray*)provideMoreTracks:(NSInteger)num;
 -(void)trackStatsUpdated:(NSMutableDictionary*)md;
+-(NSString*)formattedDateAndTime:(NSInteger)secsSince1970;
 
 @end
 
@@ -25,7 +26,9 @@
 @property NSMutableDictionary *currentTrack;
 @property NSInteger minQueueSize;
 @property BOOL stopAtEndOfThisTrack;
+@property float volume;
 @property (weak) IBOutlet id<PlayQueueDelegate>delegate;
+@property (weak) IBOutlet NSSlider *volSlider;
 -(void)play;
 -(void)stopAllPlay;
 -(void)emptyQueue;

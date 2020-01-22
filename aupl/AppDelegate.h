@@ -29,6 +29,7 @@ enum
 @property (weak) IBOutlet NSTableView *mainTableView;
 @property BOOL isPlaying;
 @property IBOutlet PlayQueue *playqueue;
+-(NSString*)formattedDateAndTime:(NSInteger)secsSince1970;
 
 @end
 
