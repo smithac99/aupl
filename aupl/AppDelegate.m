@@ -485,15 +485,15 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 {
     NSIndexSet *selectedRows = [_mainTableView selectedRowIndexes];
     NSInteger clickedRow = [_mainTableView clickedRow];
-    if (clickedRow == -1 || [selectedRows containsIndex:clickedRow])
+    if ((clickedRow == -1 || [selectedRows containsIndex:clickedRow]) && [selectedRows count] > 0)
     {
         return [_entryList objectsAtIndexes:selectedRows];
     }
-    else
+    else if (clickedRow >= 0)
     {
-        return [_entryList objectAtIndex:clickedRow];
+        return @[[_entryList objectAtIndex:clickedRow]];
     }
-    return @[@0];
+    return @[[_entryList objectAtIndex:0]];
 }
 
 -(void)keepQueue
@@ -525,7 +525,7 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
     }
     if (!_isPlaying)
     {
-        if (_playqueue.currentTrack == nil)
+        if (_playqueue.currentTrack == nil && [_playqueue.queue count] == 0)
         {
             NSArray *ns = [self trackIndexesToPlay];
             [_playqueue buildQueueFrom:ns];
@@ -535,8 +535,10 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
             [_playqueue goToNext];
         }
         else
+        {
+            [self setIsPlaying:YES];
             [_playqueue play];
-        [self setIsPlaying:YES];
+        }
     }
     else
     {

@@ -103,7 +103,10 @@
 
 -(void)play
 {
-    [self playCurrentTrack];
+    if (self.currentTrack)
+        [self playCurrentTrack];
+    else
+        [self goToNext];
 }
 
 -(void)playCurrentTrack
@@ -284,6 +287,7 @@
     else
     {
         [self moveCurrentToHistory];
+        [self updateLabelsEtc];
         self.stopAtEndOfThisTrack = NO;
         [self notifyPlayStatusChange];
     }
