@@ -10,6 +10,7 @@
 #import "AppDelegate.h"
 #import <AVFoundation/AVFoundation.h>
 #import <sys/stat.h>
+#import "NSMutableArray+NSMutableArray_Additions.h"
 
 NSString *AUPL_PLAY_CHANGED = @"AUPL_PLAY_CHANGED";
 

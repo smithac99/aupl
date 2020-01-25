@@ -1011,7 +1011,7 @@
                                                 <rect key="frame" x="1" y="0.0" width="274" height="259"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="43" rowSizeStyle="automatic" headerView="Dlr-h1-Vkr" viewBased="YES" floatsGroupRows="NO" id="VMo-76-n4j">
+                                                    <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" rowHeight="43" rowSizeStyle="automatic" headerView="Dlr-h1-Vkr" viewBased="YES" floatsGroupRows="NO" id="VMo-76-n4j">
                                                         <rect key="frame" x="0.0" y="0.0" width="274" height="234"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>

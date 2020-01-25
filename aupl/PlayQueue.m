@@ -8,6 +8,10 @@
 
 #import "PlayQueue.h"
 #import "AppDelegate.h"
+#import "NSMutableArray+NSMutableArray_Additions.h"
+
+NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
+
 @interface PlayQueue()
 {
     NSTimeInterval dispatchToken;
@@ -45,6 +49,7 @@
         [self resetLabels];
         self.volume = 1;
         [self.volSlider setFloatValue:self.volume];
+        [_queueTableView registerForDraggedTypes:@[AUPLQIndexTypePasteboardType]];
         [super awakeFromNib];
     }
 }
@@ -428,6 +433,37 @@ NSString *timePrint(NSTimeInterval secs)
     }
     [_queueTableView selectRowIndexes:[[NSIndexSet alloc]init] byExtendingSelection:NO];
     [_queueTableView reloadData];
+}
+
+- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard*)pboard
+   {
+    NSArray *typeArray = @[AUPLQIndexTypePasteboardType];
+    [pboard declareTypes:typeArray owner:self];
+    return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:rowIndexes] forType:AUPLQIndexTypePasteboardType];
+   }
+
+- (NSDragOperation)tableView:(NSTableView*)tabView validateDrop:(id <NSDraggingInfo>)info
+                 proposedRow:(int)row proposedDropOperation:(NSTableViewDropOperation)operation
+{
+    id source = [info draggingSource];
+    if ([source isKindOfClass:[_queueTableView class]])
+    {
+        if (operation == NSTableViewDropOn)
+            return  NSDragOperationNone;
+        else
+            return NSDragOperationMove;
+    }
+    return  NSDragOperationNone;
+}
+
+- (BOOL)tableView:(NSTableView*)aTableView acceptDrop:(id <NSDraggingInfo>)info row:(NSInteger)row dropOperation:(NSTableViewDropOperation)operation
+{
+    NSPasteboard* pboard = [info draggingPasteboard];
+    NSData* rowData = [pboard dataForType:AUPLQIndexTypePasteboardType];
+    NSIndexSet* rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowData];
+    [_queue moveObjectsAtIndexes:rowIndexes toIndex:row];
+    [aTableView reloadData];
+    return YES;
 }
 
 @end
