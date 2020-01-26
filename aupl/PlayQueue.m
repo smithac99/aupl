@@ -121,6 +121,7 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
     NSMutableDictionary *md = self.currentTrack;
     AuPlayer *pl = md[@"player"];
     [pl play];
+    [self startPeriodicUpdates];
 }
 
 -(NSMutableDictionary*)queueObject:(NSInteger)trackNumber
@@ -431,6 +432,25 @@ NSString *timePrint(NSTimeInterval secs)
     {
         [_queue removeObjectAtIndex:clickedRow];
     }
+    [_queueTableView selectRowIndexes:[[NSIndexSet alloc]init] byExtendingSelection:NO];
+    [_queueTableView reloadData];
+}
+
+- (IBAction)clearFromHere:(id)sender
+{
+    NSIndexSet *selectedRows = [_queueTableView selectedRowIndexes];
+    NSInteger clickedRow = [_queueTableView clickedRow];
+    NSInteger startIndex;
+    if (clickedRow == -1 || [selectedRows containsIndex:clickedRow])
+    {
+        [_queue removeObjectsAtIndexes:selectedRows];
+        startIndex = [selectedRows firstIndex];
+    }
+    else
+    {
+        startIndex = clickedRow;
+    }
+    [_queue removeObjectsInRange:NSMakeRange(clickedRow, [_queue count] - clickedRow)];
     [_queueTableView selectRowIndexes:[[NSIndexSet alloc]init] byExtendingSelection:NO];
     [_queueTableView reloadData];
 }
