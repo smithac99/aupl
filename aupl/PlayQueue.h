@@ -18,7 +18,7 @@
 -(NSArray*)provideMoreTracks:(NSInteger)num;
 -(void)trackStatsUpdated:(NSMutableDictionary*)md;
 -(NSString*)formattedDateAndTime:(NSInteger)secsSince1970;
-
+-(NSImage*)findImageForTrack:(NSMutableDictionary*)trackDict;
 @end
 
 @interface PlayQueue : NSObject<PlayerDelegate>

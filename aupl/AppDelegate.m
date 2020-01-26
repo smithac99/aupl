@@ -76,9 +76,10 @@ NSString *retrievableColumns;
 	
 }
 
--(void)tryInsertFilePath:(NSDictionary*)metaDataDict
+-(void)tryInsertFilePath:(NSMutableDictionary*)metaDataDict
 {
 	NSString *relpath = [self pathRelativeToBase:metaDataDict[@"filePath"]];
+    metaDataDict[@"relPath"] = relpath;
     NSString *artist = metaDataDict[@"artist"];
     NSString *track = metaDataDict[@"track"];
     NSString *album = metaDataDict[@"album"];
@@ -161,6 +162,24 @@ NSString *retrievableColumns;
     }
     return -1;
 }
+
+-(NSImage*)findImageForTrack:(NSMutableDictionary*)trackDict
+{
+    NSString *filePath = [self fullPathForRelPath:trackDict[@"relPath"]];
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:url options:nil];
+    NSArray *artworks = [AVMetadataItem metadataItemsFromArray:asset.commonMetadata withKey:AVMetadataCommonKeyArtwork keySpace:AVMetadataKeySpaceCommon];
+    if (artworks && [artworks count] > 0)
+    {
+        AVMetadataItem *art = [artworks firstObject];
+
+        NSData *d = (NSData*)art.value;
+        NSImage *im = [[NSImage alloc]initWithData:d];
+        return im;
+    }
+    return nil;
+}
+
 -(void)processFile:(NSString*)filePath
 {
     NSLog(@"%@",filePath);

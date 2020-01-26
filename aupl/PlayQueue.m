@@ -362,6 +362,18 @@ NSString *timePrint(NSTimeInterval secs)
     dispatchToken = 0;
 }
 
+-(NSImage*)imageForTrackDict:(NSMutableDictionary *)td
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSImage *im = [self.delegate findImageForTrack:td];
+        if (im)
+        {
+            td[@"image"] = im;
+            [self.queueTableView reloadData];
+        }
+    });
+    return [NSImage imageNamed:@"missing.png"];
+}
 #pragma mark -
 
 - (IBAction)volSliderHit:(id)sender
@@ -395,7 +407,10 @@ NSString *timePrint(NSTimeInterval secs)
         [songf setStringValue:td[@"track"]];
         NSString *artistalbum = [NSString stringWithFormat:@"%@ - %@",td[@"artist"],td[@"album"]];
         [[v viewWithTag:3] setStringValue:artistalbum];
-
+        NSImageView *iv = [v viewWithTag:1];
+        if (td[@"image"] == nil)
+            td[@"image"] = [self imageForTrackDict:td];
+        [iv setImage:td[@"image"]];
         return v;
     }
 
