@@ -10,6 +10,8 @@
 #import "AppDelegate.h"
 #import <AVFoundation/AVFoundation.h>
 #import <sys/stat.h>
+#import "NSMutableArray+NSMutableArray_Additions.h"
+#import "NSString+OBAdditions.h"
 
 NSString *AUPL_PLAY_CHANGED = @"AUPL_PLAY_CHANGED";
 
@@ -74,9 +76,10 @@ NSString *retrievableColumns;
 	
 }
 
--(void)tryInsertFilePath:(NSDictionary*)metaDataDict
+-(void)tryInsertFilePath:(NSMutableDictionary*)metaDataDict
 {
 	NSString *relpath = [self pathRelativeToBase:metaDataDict[@"filePath"]];
+    metaDataDict[@"relPath"] = relpath;
     NSString *artist = metaDataDict[@"artist"];
     NSString *track = metaDataDict[@"track"];
     NSString *album = metaDataDict[@"album"];
@@ -159,6 +162,24 @@ NSString *retrievableColumns;
     }
     return -1;
 }
+
+-(NSImage*)findImageForTrack:(NSMutableDictionary*)trackDict
+{
+    NSString *filePath = [self fullPathForRelPath:trackDict[@"relPath"]];
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:url options:nil];
+    NSArray *artworks = [AVMetadataItem metadataItemsFromArray:asset.commonMetadata withKey:AVMetadataCommonKeyArtwork keySpace:AVMetadataKeySpaceCommon];
+    if (artworks && [artworks count] > 0)
+    {
+        AVMetadataItem *art = [artworks firstObject];
+
+        NSData *d = (NSData*)art.value;
+        NSImage *im = [[NSImage alloc]initWithData:d];
+        return im;
+    }
+    return nil;
+}
+
 -(void)processFile:(NSString*)filePath
 {
     NSLog(@"%@",filePath);
@@ -358,7 +379,19 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
     NSString *searchString = @"";
     if ([search length] > 0)
     {
-        searchString = [NSString stringWithFormat:@"where artist like \"%%%%%@%%%%\" or album like \"%%%%%@%%%%\" or track like \"%%%%%@%%%%\"",search,search,search ] ;
+        NSArray *searchArray = [search nonBlankComponentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        NSMutableString *ms = [[NSMutableString alloc]init];
+        NSString *conjunc = @"where" ;
+        for (NSString *s in searchArray)
+        {
+            if (![s containsString:@"\""])
+            {
+                [ms appendFormat:@"%@ (artist like \"%%%%%@%%%%\" or album like \"%%%%%@%%%%\" or track like \"%%%%%@%%%%\")",conjunc,search,search,search ] ;
+                conjunc = @"and";
+            }
+        }
+        searchString = ms;
+        //searchString = [NSString stringWithFormat:@"where artist like \"%%%%%@%%%%\" or album like \"%%%%%@%%%%\" or track like \"%%%%%@%%%%\"",search,search,search ] ;
     }
 	NSString *orderString = [[self columnsOrderBy:self.sortColumn]componentsJoinedByString:@","];
 	NSString *qs = [NSString stringWithFormat:@"%@ %@ order by %@",st,searchString,orderString];
@@ -684,9 +717,12 @@ static void setFields(NSString *ident,NSMutableDictionary *md,char *buffer,char 
 {
     NSFileHandle *fh = [NSFileHandle fileHandleForReadingAtPath:path];
     NSData *data = [self readLastBytes:128 from:fh];
-    char *bytes = (char*)[data bytes];
-    if (memcmp(bytes, "TAG", 3) == 0)
-        return [self id3v1Tags:data];
+    if ([data length] >= 128)
+    {
+        char *bytes = (char*)[data bytes];
+        if (memcmp(bytes, "TAG", 3) == 0)
+            return [self id3v1Tags:data];
+    }
     return nil;
 }
 
@@ -697,9 +733,12 @@ static void setFields(NSString *ident,NSMutableDictionary *md,char *buffer,char 
     if (ret == 0)
     {
         NSInteger sz = st.st_size;
-        NSInteger offset = sz - 128;
-        [fh seekToFileOffset:offset];
-        return [fh readDataToEndOfFile];
+        if (sz > 128)
+        {
+            NSInteger offset = sz - 128;
+            [fh seekToFileOffset:offset];
+            return [fh readDataToEndOfFile];
+        }
     }
     return nil;
 }

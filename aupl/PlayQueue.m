@@ -8,6 +8,10 @@
 
 #import "PlayQueue.h"
 #import "AppDelegate.h"
+#import "NSMutableArray+NSMutableArray_Additions.h"
+
+NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
+
 @interface PlayQueue()
 {
     NSTimeInterval dispatchToken;
@@ -45,6 +49,7 @@
         [self resetLabels];
         self.volume = 1;
         [self.volSlider setFloatValue:self.volume];
+        [_queueTableView registerForDraggedTypes:@[AUPLQIndexTypePasteboardType]];
         [super awakeFromNib];
     }
 }
@@ -116,6 +121,7 @@
     NSMutableDictionary *md = self.currentTrack;
     AuPlayer *pl = md[@"player"];
     [pl play];
+    [self startPeriodicUpdates];
 }
 
 -(NSMutableDictionary*)queueObject:(NSInteger)trackNumber
@@ -356,6 +362,18 @@ NSString *timePrint(NSTimeInterval secs)
     dispatchToken = 0;
 }
 
+-(NSImage*)imageForTrackDict:(NSMutableDictionary *)td
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSImage *im = [self.delegate findImageForTrack:td];
+        if (im)
+        {
+            td[@"image"] = im;
+            [self.queueTableView reloadData];
+        }
+    });
+    return [NSImage imageNamed:@"missing.png"];
+}
 #pragma mark -
 
 - (IBAction)volSliderHit:(id)sender
@@ -389,7 +407,10 @@ NSString *timePrint(NSTimeInterval secs)
         [songf setStringValue:td[@"track"]];
         NSString *artistalbum = [NSString stringWithFormat:@"%@ - %@",td[@"artist"],td[@"album"]];
         [[v viewWithTag:3] setStringValue:artistalbum];
-
+        NSImageView *iv = [v viewWithTag:1];
+        if (td[@"image"] == nil)
+            td[@"image"] = [self imageForTrackDict:td];
+        [iv setImage:td[@"image"]];
         return v;
     }
 
@@ -428,6 +449,56 @@ NSString *timePrint(NSTimeInterval secs)
     }
     [_queueTableView selectRowIndexes:[[NSIndexSet alloc]init] byExtendingSelection:NO];
     [_queueTableView reloadData];
+}
+
+- (IBAction)clearFromHere:(id)sender
+{
+    NSIndexSet *selectedRows = [_queueTableView selectedRowIndexes];
+    NSInteger clickedRow = [_queueTableView clickedRow];
+    NSInteger startIndex;
+    if (clickedRow == -1 || [selectedRows containsIndex:clickedRow])
+    {
+        [_queue removeObjectsAtIndexes:selectedRows];
+        startIndex = [selectedRows firstIndex];
+    }
+    else
+    {
+        startIndex = clickedRow;
+    }
+    [_queue removeObjectsInRange:NSMakeRange(clickedRow, [_queue count] - clickedRow)];
+    [_queueTableView selectRowIndexes:[[NSIndexSet alloc]init] byExtendingSelection:NO];
+    [_queueTableView reloadData];
+}
+
+- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard*)pboard
+   {
+    NSArray *typeArray = @[AUPLQIndexTypePasteboardType];
+    [pboard declareTypes:typeArray owner:self];
+    return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:rowIndexes] forType:AUPLQIndexTypePasteboardType];
+   }
+
+- (NSDragOperation)tableView:(NSTableView*)tabView validateDrop:(id <NSDraggingInfo>)info
+                 proposedRow:(int)row proposedDropOperation:(NSTableViewDropOperation)operation
+{
+    id source = [info draggingSource];
+    if ([source isKindOfClass:[_queueTableView class]])
+    {
+        if (operation == NSTableViewDropOn)
+            return  NSDragOperationNone;
+        else
+            return NSDragOperationMove;
+    }
+    return  NSDragOperationNone;
+}
+
+- (BOOL)tableView:(NSTableView*)aTableView acceptDrop:(id <NSDraggingInfo>)info row:(NSInteger)row dropOperation:(NSTableViewDropOperation)operation
+{
+    NSPasteboard* pboard = [info draggingPasteboard];
+    NSData* rowData = [pboard dataForType:AUPLQIndexTypePasteboardType];
+    NSIndexSet* rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowData];
+    [_queue moveObjectsAtIndexes:rowIndexes toIndex:row];
+    [aTableView reloadData];
+    return YES;
 }
 
 @end
