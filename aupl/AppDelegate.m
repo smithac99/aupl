@@ -167,7 +167,7 @@ NSString *retrievableColumns;
 	NSError *err = nil;
 	if ([url getResourceValue:&type forKey:NSURLTypeIdentifierKey error:&err])
 	{
-		if (UTTypeConformsTo((__bridge CFStringRef)type,(CFStringRef)@"public.audio"))
+		if (UTTypeConformsTo((__bridge CFStringRef)type,(CFStringRef)@"public.audio") && ![[filePath pathExtension]isEqualToString:@"m4p"])
 		{
 			AVURLAsset *asset = [AVURLAsset URLAssetWithURL:url options:nil];
 			
