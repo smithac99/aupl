@@ -164,6 +164,44 @@ NSString *retrievableColumns;
     return -1;
 }
 
+-(NSString*)coverImagePathInDirectory:(NSString*)dirPath
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
+	NSArray *contents = [fm contentsOfDirectoryAtPath:dirPath error:nil];
+	for (NSString *member in contents)
+	{
+		NSString *type = nil;
+		NSError *err = nil;
+		if ([member hasPrefix:@"cover"] || [member hasPrefix:@"Cover"])
+		{
+			NSString *fullPath = [dirPath stringByAppendingPathComponent:member];
+			NSURL *url = [NSURL fileURLWithPath:fullPath];
+			if ([url getResourceValue:&type forKey:NSURLTypeIdentifierKey error:&err])
+			{
+				if (UTTypeConformsTo((__bridge CFStringRef)type,(CFStringRef)@"public.image"))
+				{
+					return fullPath;
+				}
+			}
+		}
+	}
+	return nil;
+}
+
+-(NSImage*)findDirectoryImageForTrack:(NSMutableDictionary*)trackDict
+{
+    NSString *filePath = [self fullPathForRelPath:trackDict[@"relPath"]];
+	NSString *dirPath = [filePath stringByDeletingLastPathComponent];
+	NSString *imagePath = [self coverImagePathInDirectory:dirPath];
+	NSFileManager *fm = [NSFileManager defaultManager];
+	
+	if ([fm fileExistsAtPath:imagePath])
+	{
+		NSImage *im = [[NSImage alloc]initWithContentsOfFile:imagePath];
+		return im;
+	}
+    return nil;
+}
 -(NSImage*)findImageForTrack:(NSMutableDictionary*)trackDict
 {
     NSString *filePath = [self fullPathForRelPath:trackDict[@"relPath"]];
@@ -176,9 +214,10 @@ NSString *retrievableColumns;
 
         NSData *d = (NSData*)art.value;
         NSImage *im = [[NSImage alloc]initWithData:d];
-        return im;
+		if (im)
+			return im;
     }
-    return nil;
+	return [self findDirectoryImageForTrack:trackDict];
 }
 - (IBAction)locateInFinder:(id)sender
 {
