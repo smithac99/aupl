@@ -47,7 +47,8 @@ NSString *retrievableColumns;
 
 - (void)playStatusChanged:(NSNotification *)notification
 {
-    _isPlaying = ([_playqueue anyThingPlaying]);
+    //_isPlaying = ([_playqueue anyThingPlaying]);
+    _playPauseButton.highlighted = _isPlaying;
 }
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
@@ -178,6 +179,20 @@ NSString *retrievableColumns;
         return im;
     }
     return nil;
+}
+- (IBAction)locateInFinder:(id)sender
+{
+    NSArray *indexes = [self trackIndexesToPlay];
+    NSMutableArray *arr = [NSMutableArray array];
+    for (NSNumber *n in indexes)
+    {
+        NSInteger i = [n integerValue];
+        NSDictionary *track = [self trackForIdx:i];
+        NSString *path = [self fullPathForRelPath:track[@"relPath"]];
+        if (path)
+            [arr addObject:[NSURL fileURLWithPath:path]];
+    }
+    [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:arr];
 }
 
 -(void)processFile:(NSString*)filePath
@@ -587,6 +602,7 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
     [self keepQueue];
     [self setIsPlaying:YES];
     [_playqueue goToNext];
+    [[NSNotificationCenter defaultCenter]postNotification:[NSNotification notificationWithName:AUPL_PLAY_CHANGED object:nil]];
 }
 
 - (IBAction)playNext:(id)sender
@@ -743,6 +759,22 @@ static void setFields(NSString *ident,NSMutableDictionary *md,char *buffer,char 
     return nil;
 }
 
+-(NSArray*)firstNonEmptyMetaDataForKeys:(NSArray*)keys asset:(AVURLAsset*)asset
+{
+    for (NSString *key in keys)
+    {
+        NSArray *a =[AVMetadataItem metadataItemsFromArray:asset.commonMetadata withKey:key keySpace:AVMetadataKeySpaceCommon];
+        if ([a count] > 0)
+            return a;
+    }
+    for (NSString *key in keys)
+    {
+        NSArray *a =[AVMetadataItem metadataItemsFromArray:asset.metadata withKey:key keySpace:nil];
+        if ([a count] > 0)
+            return a;
+    }
+    return @[];
+}
 -(NSDictionary*)appleTags:(AVURLAsset*)asset
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -752,6 +784,14 @@ static void setFields(NSString *ident,NSMutableDictionary *md,char *buffer,char 
     NSArray *albumNames = [AVMetadataItem metadataItemsFromArray:asset.commonMetadata withKey:AVMetadataCommonKeyAlbumName keySpace:AVMetadataKeySpaceCommon];
     //NSArray *trackNumbers = [AVMetadataItem metadataItemsFromArray:asset.metadata withKey:AVMetadataiTunesMetadataKeyTrackNumber keySpace:AVMetadataKeySpaceiTunes];
 
+    
+    if ([artists count] == 0)
+    {
+        artists = [self firstNonEmptyMetaDataForKeys:@[AVMetadataCommonKeyArtist,AVMetadataIdentifierID3MetadataLeadPerformer,AVMetadataIdentifierID3MetadataBand] asset:asset];
+        artists = [AVMetadataItem metadataItemsFromArray:asset.metadata withKey:AVMetadataIdentifierID3MetadataLeadPerformer keySpace:AVMetadataKeySpaceID3];
+        if ([artists count] == 0)
+            artists = [AVMetadataItem metadataItemsFromArray:asset.metadata withKey:AVMetadataIdentifierID3MetadataBand  keySpace:AVMetadataKeySpaceID3];
+    }
     AVMetadataItem *title = [titles firstObject];
     AVMetadataItem *artist = [artists firstObject];
     AVMetadataItem *albumName = [albumNames firstObject];
