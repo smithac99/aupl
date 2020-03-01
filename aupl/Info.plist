@@ -28,5 +28,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>search root</key>
+	<string>https://musicbrainz.org/ws/2/</string>
 </dict>
 </plist>
