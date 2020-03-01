@@ -36,11 +36,12 @@ NSString *retrievableColumns;
 {
     lastProvidedIndex = -1;
 	orderableColumns = @[@"artist",@"album",@"trackNumber",@"track",@"created",@"lastPlayed",@"timesPlayed",@"idx"];
-	self.sortColumn = orderableColumns[0];
 	retrievableColumns = @"idx,relPath,artist,track,album,created,lastPlayed,timesPlayed";
 	self.directorySearchQueue = [NSMutableArray array];
 	_entryList = [[NSMutableArray alloc]init];
 	_entryCache = [[NSMutableDictionary alloc]init];
+	if (self.sortColumn == nil)
+		self.sortColumn = orderableColumns[0];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playStatusChanged:) name:AUPL_PLAY_CHANGED object:nil];
 	[self chooseRootDirectoryStartAt:nil];
 }
@@ -77,7 +78,7 @@ NSString *retrievableColumns;
 	
 }
 
--(void)tryInsertFilePath:(NSMutableDictionary*)metaDataDict
+-(BOOL)tryInsertFilePath:(NSMutableDictionary*)metaDataDict
 {
 	NSString *relpath = [self pathRelativeToBase:metaDataDict[@"filePath"]];
     metaDataDict[@"relPath"] = relpath;
@@ -99,7 +100,10 @@ NSString *retrievableColumns;
 	NSDictionary *row = [self.db getRow:stmt];
 	[self.db closeStatement:stmt];
 	if (row)
+	{
 		[self tryReplaceFilePath:relpath row:row];
+		return NO;
+	}
 	else
 	{
         NSInteger discNo = [metaDataDict[@"discno"]integerValue];
@@ -107,13 +111,11 @@ NSString *retrievableColumns;
         NSInteger crdate = [metaDataDict[@"crdate"]integerValue];
         NSString *is1 = [NSString stringWithFormat:@"insert into tracks(relPath,artist,track,album,trackNumber,created%@)",discNo>0?@",discNumber":@""];
         NSString *is2 = [NSString stringWithFormat:@" values(?,?,?,?,?,?%@)",discNo>0?@",?":@""];
-		//[self.db beginTransaction];
         NSMutableArray *pars = [NSMutableArray arrayWithArray:@[relpath,artist,track,album,@(trackNo),@(crdate)]];
         if (discNo > 0)
             [pars addObject:@(discNo)];
 		[self.db doQuery:[is1 stringByAppendingString:is2] parameters:pars];
-		//[self.db commitTransaction];
-        //[self refresh:0];
+		return YES;
 	}
 }
 
@@ -234,64 +236,73 @@ NSString *retrievableColumns;
     [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:arr];
 }
 
--(void)processFile:(NSString*)filePath
+-(BOOL)isMusicURL:(NSURL*)url
 {
-    NSLog(@"%@",filePath);
-	NSURL *url = [NSURL fileURLWithPath:filePath];
 	NSString *type = nil;
 	NSError *err = nil;
 	if ([url getResourceValue:&type forKey:NSURLTypeIdentifierKey error:&err])
-	{
-		if (UTTypeConformsTo((__bridge CFStringRef)type,(CFStringRef)@"public.audio") && ![[filePath pathExtension]isEqualToString:@"m4p"])
-		{
-			AVURLAsset *asset = [AVURLAsset URLAssetWithURL:url options:nil];
-			
-            NSMutableDictionary *metaDataDict = [[self appleTags:asset]mutableCopy];
-            metaDataDict[@"filePath"] = filePath;
-            if (metaDataDict[@"track"] == nil ||metaDataDict[@"artist"] == nil ||metaDataDict[@"album"] == nil )
-            {
-                NSDictionary *id3d = [self readTagFromPath:filePath];
-                if ([[id3d allKeys]count] > 0)
-                {
-                    NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary:id3d];
-                    [md addEntriesFromDictionary:metaDataDict];
-                    metaDataDict = md;
-                }
-            }
-            if (metaDataDict[@"trkno"] == nil || metaDataDict[@"track"] == nil)
-            {
-                NSString *filename = [[filePath lastPathComponent]stringByDeletingPathExtension];
-                NSDictionary *dtdict = [self discAndTrackNoPrefixOfString:filename];
-                metaDataDict[@"trkno"] = dtdict[@"trk"];
-                metaDataDict[@"discno"] = dtdict[@"disk"];
-                if (metaDataDict[@"track"] == nil)
-                {
-                    NSInteger namest = [dtdict[@"idx"]integerValue];
-                    filename = [filename substringFromIndex:namest];
-                    if ([filename hasPrefix:@" "])
-                        filename = [filename substringFromIndex:1];
-                    metaDataDict[@"track"] = filename;
-                }
-                if (metaDataDict[@"album"] == nil)
-                {
-                    NSArray *comps = [url pathComponents];
-                    metaDataDict[@"album"] = [comps objectAtIndex:[comps count] - 2];
-                }
-            }
-            NSDate *crdate = nil;
-            NSInteger secs1970 = 0;
-            BOOL ok = [url getResourceValue:&crdate forKey:NSURLCreationDateKey error:nil];
-            if (ok)
-            {
-                secs1970 = (NSInteger)[crdate timeIntervalSince1970];
-                metaDataDict[@"crdate"] = @(secs1970);
-            }
-			DoOnDatabaseQueue(^{
-                [self tryInsertFilePath:metaDataDict];
-			});
-		}
-	}
+		if (UTTypeConformsTo((__bridge CFStringRef)type,(CFStringRef)@"public.audio") && ![[url pathExtension]isEqualToString:@"m4p"])
+			return YES;
+	return NO;
 }
+
+-(BOOL)processFile:(NSString*)filePath
+{
+    NSLog(@"%@",filePath);
+	NSURL *url = [NSURL fileURLWithPath:filePath];
+	if ([self isMusicURL:url])
+	{
+		AVURLAsset *asset = [AVURLAsset URLAssetWithURL:url options:nil];
+		
+		NSMutableDictionary *metaDataDict = [[self appleTags:asset]mutableCopy];
+		metaDataDict[@"filePath"] = filePath;
+		if (metaDataDict[@"track"] == nil ||metaDataDict[@"artist"] == nil ||metaDataDict[@"album"] == nil )
+		{
+			NSDictionary *id3d = [self readTagFromPath:filePath];
+			if ([[id3d allKeys]count] > 0)
+			{
+				NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary:id3d];
+				[md addEntriesFromDictionary:metaDataDict];
+				metaDataDict = md;
+			}
+		}
+		if (metaDataDict[@"trkno"] == nil || metaDataDict[@"track"] == nil)
+		{
+			NSString *filename = [[filePath lastPathComponent]stringByDeletingPathExtension];
+			NSDictionary *dtdict = [self discAndTrackNoPrefixOfString:filename];
+			metaDataDict[@"trkno"] = dtdict[@"trk"];
+			metaDataDict[@"discno"] = dtdict[@"disk"];
+			if (metaDataDict[@"track"] == nil)
+			{
+				NSInteger namest = [dtdict[@"idx"]integerValue];
+				filename = [filename substringFromIndex:namest];
+				if ([filename hasPrefix:@" "])
+					filename = [filename substringFromIndex:1];
+				metaDataDict[@"track"] = filename;
+			}
+			if (metaDataDict[@"album"] == nil)
+			{
+				NSArray *comps = [url pathComponents];
+				metaDataDict[@"album"] = [comps objectAtIndex:[comps count] - 2];
+			}
+		}
+		NSDate *crdate = nil;
+		NSInteger secs1970 = 0;
+		BOOL ok = [url getResourceValue:&crdate forKey:NSURLCreationDateKey error:nil];
+		if (ok)
+		{
+			secs1970 = (NSInteger)[crdate timeIntervalSince1970];
+			metaDataDict[@"crdate"] = @(secs1970);
+		}
+		__block BOOL inserted = NO;
+		DoOnDatabaseQueue(^{
+			inserted = [self tryInsertFilePath:metaDataDict];
+		});
+		return inserted;
+	}
+	return NO;
+}
+
 -(void)processQueue:(int)ct
 {
     if (ct <= 0)
@@ -331,10 +342,65 @@ NSString *retrievableColumns;
             [self processQueue:ct - 1];
         });
 }
+
 - (IBAction)fullScan:(id)sender
 {
     [self.directorySearchQueue addObject:[self.rootURL path]];
     [self processQueue:4000];
+}
+
+-(void)processTimeQueue
+{
+	if ([self.directorySearchQueue count] == 0)
+		return;
+	NSString* dirPath = [self.directorySearchQueue firstObject];
+	[self.directorySearchQueue removeObjectAtIndex:0];
+	NSFileManager *fm = [NSFileManager defaultManager];
+	NSError *err;
+	NSMutableArray *trks = [NSMutableArray array];
+	NSMutableArray *dirs = [NSMutableArray array];
+	for (NSString *f in [fm contentsOfDirectoryAtPath:dirPath error:&err])
+	{
+		if (![f hasPrefix:@"."])
+		{
+			BOOL isDir = NO;
+			NSString *fullPath = [dirPath stringByAppendingPathComponent:f];
+			if ([fm fileExistsAtPath:fullPath isDirectory:&isDir])
+			{
+				if (isDir)
+				{
+					NSDictionary *dict = [fm attributesOfItemAtPath:fullPath error:&err];
+					NSDate *d = [dict fileModificationDate];
+					[dirs addObject:@[fullPath,d]];
+				}
+				else
+				{
+					if ([self isMusicURL:[NSURL fileURLWithPath:fullPath]])
+						[trks addObject:fullPath];
+				}
+			}
+		}
+	}
+	[dirs sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+		NSDate *d1 = [obj1 objectAtIndex:1];
+		NSDate *d2 = [obj2 objectAtIndex:1];
+		return [d1 compare:d2];
+	}];
+	for (NSArray *arr in dirs)
+		[self.directorySearchQueue insertObject:arr[0] atIndex:0];
+	BOOL inserted = NO;
+	for (NSString *path in trks)
+		inserted = [self processFile:path] || inserted;
+	[self refresh:AD_REFRESH_IF_ROW_COUNT_CHANGED];
+    if ([self.directorySearchQueue count] > 0)
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self processTimeQueue];
+        });
+}
+- (IBAction)partialScan:(id)sender
+{
+    [self.directorySearchQueue addObject:[self.rootURL path]];
+	[self processTimeQueue];
 }
 
 -(void)processQueue
@@ -552,19 +618,30 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 -(void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn
 {
     NSLog(@"didClick %@",[tableColumn identifier]);
-    if ([self.sortColumn isEqualToString:[tableColumn identifier]])
+/*    if ([self.sortColumn isEqualToString:[tableColumn identifier]])
         self.sortDescending = !self.sortDescending;
     else
     {
         self.sortDescending = NO;
         self.sortColumn = [tableColumn identifier];
     }
-    [self refresh:AD_REFRESH_ROW_ORDER];
+    [self refresh:AD_REFRESH_ROW_ORDER];*/
 }
 
 - (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray *)oldDescriptors
 {
-    [tableView reloadData];
+	NSArray *sds = [tableView sortDescriptors];
+	if ([sds count] == 0)
+		return;
+	NSSortDescriptor *sd = sds[0];
+	if (!([sd.key isEqualToString:self.sortColumn] && (sd.ascending != self.sortDescending)))
+	{
+		self.sortColumn = sd.key;
+		self.sortDescending = !sd.ascending;
+		if (self.db)
+			[self refresh:AD_REFRESH_ROW_ORDER];
+	}
+    //[tableView reloadData];
 }
 #pragma mark -
 
@@ -842,4 +919,9 @@ static void setFields(NSString *ident,NSMutableDictionary *md,char *buffer,char 
         dict[@"album"] = albumName.value;
     return dict;
 }
+
+- (IBAction)LocateInMainWindow:(id)sender
+{
+}
+
 @end
