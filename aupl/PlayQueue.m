@@ -428,6 +428,10 @@ NSString *timePrint(NSTimeInterval secs)
         NSTextField *dt = [v viewWithTag:4];
         NSTimeInterval st = [td[@"lastPlayed"]integerValue];
         [dt setStringValue:[_delegate formattedDateAndTime:st]];
+        NSImageView *iv = [v viewWithTag:1];
+        if (td[@"image"] == nil)
+            td[@"image"] = [self imageForTrackDict:td];
+        [iv setImage:td[@"image"]];
         return v;
     }
 

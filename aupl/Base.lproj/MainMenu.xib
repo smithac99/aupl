@@ -635,6 +635,12 @@
                                     <action selector="fullScan:" target="Voe-Tx-rLC" id="Prx-Qj-mFL"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Partial Scan" id="GU4-hK-Go8">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="partialScan:" target="Voe-Tx-rLC" id="Ldf-Yn-11v"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
@@ -796,7 +802,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="roundRect" title="cont" bezelStyle="roundedRect" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qcZ-RU-Bis">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
-                            <font key="font" metaFont="controlContent"/>
+                            <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
                         <connections>
                             <binding destination="cjY-wE-VBN" name="value" keyPath="values.continue" id="Y8k-gq-KIs"/>
@@ -807,7 +813,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" ambiguous="YES" id="P7A-lm-1Ho">
                             <rect key="frame" x="1" y="0.0" width="610" height="400"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" typeSelect="NO" autosaveName="_maintable" headerView="2fm-4R-0tL" id="ktF-Am-yHD">
                                     <rect key="frame" x="0.0" y="0.0" width="610" height="375"/>
@@ -819,7 +825,7 @@
                                     <tableColumns>
                                         <tableColumn identifier="artist" width="116" minWidth="40" maxWidth="1000" id="cUP-IE-XTt">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Artist">
-                                                <font key="font" metaFont="label" size="11"/>
+                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -833,7 +839,7 @@
                                         </tableColumn>
                                         <tableColumn identifier="album" width="119" minWidth="40" maxWidth="1000" id="gws-fd-iMJ">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Album">
-                                                <font key="font" metaFont="label" size="11"/>
+                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -847,7 +853,7 @@
                                         </tableColumn>
                                         <tableColumn identifier="track" width="88" minWidth="10" maxWidth="3.4028234663852886e+38" id="jFY-GT-LeQ">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Track">
-                                                <font key="font" metaFont="label" size="11"/>
+                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </tableHeaderCell>
@@ -861,7 +867,7 @@
                                         </tableColumn>
                                         <tableColumn identifier="created" width="111" minWidth="10" maxWidth="3.4028234663852886e+38" id="fn5-xc-uOb">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Created">
-                                                <font key="font" metaFont="label" size="11"/>
+                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </tableHeaderCell>
@@ -875,7 +881,7 @@
                                         </tableColumn>
                                         <tableColumn identifier="lastPlayed" width="96" minWidth="10" maxWidth="3.4028234663852886e+38" id="Snu-mQ-eg3">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Last Played">
-                                                <font key="font" metaFont="label" size="11"/>
+                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </tableHeaderCell>
@@ -889,7 +895,7 @@
                                         </tableColumn>
                                         <tableColumn identifier="timesPlayed" width="62" minWidth="10" maxWidth="3.4028234663852886e+38" id="fgw-Yb-efY">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Played">
-                                                <font key="font" metaFont="label" size="11"/>
+                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </tableHeaderCell>
@@ -987,7 +993,7 @@
                                 <rect key="frame" x="0.0" y="1" width="276" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" allowsUndo="NO" alignment="center" title="Label" id="NJ6-fr-504">
-                                    <font key="font" metaFont="controlContent"/>
+                                    <font key="font" metaFont="cellTitle"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -1009,7 +1015,7 @@
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" ambiguous="YES" id="SmP-tg-BLI">
                                                 <rect key="frame" x="1" y="0.0" width="274" height="259"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" rowHeight="43" rowSizeStyle="automatic" headerView="Dlr-h1-Vkr" viewBased="YES" floatsGroupRows="NO" id="VMo-76-n4j">
                                                         <rect key="frame" x="0.0" y="0.0" width="274" height="234"/>
@@ -1020,7 +1026,7 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="queue" width="267" minWidth="40" maxWidth="1000" id="FSC-br-h6P">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                                    <font key="font" metaFont="label" size="11"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1048,7 +1054,7 @@
                                                                                 <rect key="frame" x="46" y="3" width="221" height="17"/>
                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="UkJ-B1-ynD">
-                                                                                    <font key="font" metaFont="controlContent"/>
+                                                                                    <font key="font" metaFont="cellTitle"/>
                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                 </textFieldCell>
@@ -1112,7 +1118,7 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="history" width="271" minWidth="40" maxWidth="1000" id="hI7-ja-FsT">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                                    <font key="font" metaFont="label" size="11"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1145,7 +1151,7 @@
                                                                                 <rect key="frame" x="25" y="18" width="246" height="35"/>
                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="2lJ-lp-hLx">
-                                                                                    <font key="font" metaFont="controlContent"/>
+                                                                                    <font key="font" metaFont="cellTitle"/>
                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                 </textFieldCell>
@@ -1154,7 +1160,7 @@
                                                                                 <rect key="frame" x="110" y="3" width="160" height="17"/>
                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="dt" id="0Ia-WI-CIQ">
-                                                                                    <font key="font" metaFont="controlContent"/>
+                                                                                    <font key="font" metaFont="cellTitle"/>
                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                 </textFieldCell>
@@ -1235,6 +1241,13 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="clearFromHere:" target="4cf-9y-eDj" id="sgp-sH-Bue"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="vJA-iR-i1Q"/>
+                <menuItem title="Locate in Main Window" id="zGh-em-Ubn">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="LocateInMainWindow:" target="Voe-Tx-rLC" id="wli-nx-ycm"/>
                     </connections>
                 </menuItem>
             </items>
