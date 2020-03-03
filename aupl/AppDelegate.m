@@ -506,7 +506,7 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
         {
             if (![s containsString:@"\""])
             {
-                [ms appendFormat:@"%@ (artist like \"%%%%%@%%%%\" or album like \"%%%%%@%%%%\" or track like \"%%%%%@%%%%\")",conjunc,search,search,search ] ;
+                [ms appendFormat:@"%@ (artist like \"%%%%%@%%%%\" or album like \"%%%%%@%%%%\" or track like \"%%%%%@%%%%\")",conjunc,s,s,s ] ;
                 conjunc = @"and";
             }
         }
