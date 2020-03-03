@@ -455,6 +455,19 @@ NSString *timePrint(NSTimeInterval secs)
     [_queueTableView reloadData];
 }
 
+-(NSIndexSet*)rightClickedRows
+{
+    NSIndexSet *selectedRows = [_queueTableView selectedRowIndexes];
+    NSInteger clickedRow = [_queueTableView clickedRow];
+    if (clickedRow == -1 || [selectedRows containsIndex:clickedRow])
+    {
+        return selectedRows;
+    }
+    else
+    {
+        return [NSIndexSet indexSetWithIndex:clickedRow];
+    }
+}
 - (IBAction)clearFromHere:(id)sender
 {
     NSIndexSet *selectedRows = [_queueTableView selectedRowIndexes];
@@ -472,6 +485,19 @@ NSString *timePrint(NSTimeInterval secs)
     [_queue removeObjectsInRange:NSMakeRange(clickedRow, [_queue count] - clickedRow)];
     [_queueTableView selectRowIndexes:[[NSIndexSet alloc]init] byExtendingSelection:NO];
     [_queueTableView reloadData];
+}
+- (IBAction)locateInMainWindow:(id)sender
+{
+	NSIndexSet *ixs = [self rightClickedRows];
+	if ([ixs count] == 0)
+		return;
+	NSMutableArray *marr = [NSMutableArray array];
+	for (NSInteger idx = [ixs firstIndex];idx != NSNotFound;idx = [ixs indexGreaterThanIndex:idx])
+	{
+        NSMutableDictionary *md = _queue[idx];
+		[marr addObject:md[@"trackno"]];
+	}
+	[self.delegate locateInMainWindow:marr];
 }
 
 - (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard*)pboard

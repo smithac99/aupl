@@ -1247,7 +1247,7 @@
                 <menuItem title="Locate in Main Window" id="zGh-em-Ubn">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="LocateInMainWindow:" target="Voe-Tx-rLC" id="wli-nx-ycm"/>
+                        <action selector="locateInMainWindow:" target="4cf-9y-eDj" id="dIi-6h-KUk"/>
                     </connections>
                 </menuItem>
             </items>

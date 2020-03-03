@@ -804,6 +804,7 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
     return @[];
 }
 
+
 - (void)controlTextDidChange:(NSNotification *)obj
 {
     
@@ -920,8 +921,20 @@ static void setFields(NSString *ident,NSMutableDictionary *md,char *buffer,char 
     return dict;
 }
 
-- (IBAction)LocateInMainWindow:(id)sender
+- (void)locateInMainWindow:(NSArray*)tracks
 {
+	NSMutableIndexSet *mixs = [NSMutableIndexSet indexSet];
+	for (NSNumber *n in tracks)
+	{
+		NSInteger i = [self rowIndexFromTrackIndex:[n integerValue]];
+		if (i >= 0)
+			[mixs addIndex:i];
+	}
+	if ([mixs count] > 0)
+	{
+		[_mainTableView selectRowIndexes:mixs byExtendingSelection:NO];
+		[_mainTableView scrollRowToVisible:[mixs firstIndex]];
+	}
 }
 
 @end
