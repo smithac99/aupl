@@ -78,6 +78,14 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
     return [pl isPlaying];
 }
 
+-(BOOL)stillPlaying
+{
+    if (self.currentTrack == nil)
+        return NO;
+    NSMutableDictionary *md = self.currentTrack;
+    AuPlayer *pl = md[@"player"];
+    return [pl isPlaying];
+}
 -(void)updateLabelsEtc
 {
     if (self.currentTrack == nil)
@@ -504,7 +512,7 @@ NSString *timePrint(NSTimeInterval secs)
    {
     NSArray *typeArray = @[AUPLQIndexTypePasteboardType];
     [pboard declareTypes:typeArray owner:self];
-    return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:rowIndexes] forType:AUPLQIndexTypePasteboardType];
+    return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:rowIndexes requiringSecureCoding:NO error:nil] forType:AUPLQIndexTypePasteboardType];
    }
 
 - (NSDragOperation)tableView:(NSTableView*)tabView validateDrop:(id <NSDraggingInfo>)info

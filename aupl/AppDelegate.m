@@ -934,6 +934,7 @@ static void setFields(NSString *ident,NSMutableDictionary *md,char *buffer,char 
 	{
 		[_mainTableView selectRowIndexes:mixs byExtendingSelection:NO];
 		[_mainTableView scrollRowToVisible:[mixs firstIndex]];
+		[[_mainTableView window]makeKeyAndOrderFront:self];
 	}
 }
 

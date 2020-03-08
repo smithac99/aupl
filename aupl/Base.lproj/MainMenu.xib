@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -698,6 +698,12 @@
                                     <action selector="arrangeInFront:" target="-1" id="DRN-fu-gQh"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="nRt-1A-6ob"/>
+                            <menuItem title="Queue" keyEquivalent="0" id="eXy-Xg-Ik0">
+                                <connections>
+                                    <action selector="makeKeyAndOrderFront:" target="Pc6-LO-3fo" id="Ar4-Dm-ij1"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
@@ -942,13 +948,13 @@
             </view>
             <point key="canvasLocation" x="11" y="260"/>
         </window>
-        <window identifier="mini" title="panel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="mini" animationBehavior="default" titleVisibility="hidden" id="Pc6-LO-3fo" customClass="NSPanel">
-            <windowStyleMask key="styleMask" titled="YES" utility="YES"/>
+        <window identifier="mini" title="aupl queue" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="mini2" animationBehavior="default" id="Pc6-LO-3fo" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="276" height="378"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
-            <value key="minSize" type="size" width="276" height="378"/>
-            <value key="maxSize" type="size" width="276" height="500"/>
+            <value key="minSize" type="size" width="276" height="350"/>
+            <value key="maxSize" type="size" width="276" height="600"/>
             <view key="contentView" id="0d7-9M-c9J">
                 <rect key="frame" x="0.0" y="0.0" width="276" height="378"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1015,7 +1021,7 @@
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" ambiguous="YES" id="SmP-tg-BLI">
                                                 <rect key="frame" x="1" y="0.0" width="274" height="259"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" rowHeight="43" rowSizeStyle="automatic" headerView="Dlr-h1-Vkr" viewBased="YES" floatsGroupRows="NO" id="VMo-76-n4j">
                                                         <rect key="frame" x="0.0" y="0.0" width="274" height="234"/>
