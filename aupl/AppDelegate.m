@@ -392,6 +392,11 @@ NSString *retrievableColumns;
 	for (NSString *path in trks)
 		inserted = [self processFile:path] || inserted;
 	[self refresh:AD_REFRESH_IF_ROW_COUNT_CHANGED];
+	if ([trks count] > 0 && inserted == NO)
+	{
+		[self.directorySearchQueue removeAllObjects];
+		return;
+	}
     if ([self.directorySearchQueue count] > 0)
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self processTimeQueue];
