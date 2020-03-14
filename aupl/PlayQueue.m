@@ -40,6 +40,11 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
     return self;
 }
 
+-(void)defaultsChanged:(id)notif
+{
+    [self checkQueue];
+}
+
 -(void)awakeFromNib
 {
     if (!inited)
@@ -50,6 +55,7 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
         self.volume = 1;
         [self.volSlider setFloatValue:self.volume];
         [_queueTableView registerForDraggedTypes:@[AUPLQIndexTypePasteboardType]];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playStatusChanged:) name:NSUserDefaultsDidChangeNotification object:nil];
         [super awakeFromNib];
     }
 }
@@ -78,14 +84,6 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
     return [pl isPlaying];
 }
 
--(BOOL)stillPlaying
-{
-    if (self.currentTrack == nil)
-        return NO;
-    NSMutableDictionary *md = self.currentTrack;
-    AuPlayer *pl = md[@"player"];
-    return [pl isPlaying];
-}
 -(void)updateLabelsEtc
 {
     if (self.currentTrack == nil)
@@ -297,7 +295,10 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
     if (self.currentTrack == nil)
         return;
     if (!self.stopAtEndOfThisTrack)
+    {
+        [self checkQueue];
         [self goToNext];
+    }
     else
     {
         [self moveCurrentToHistory];

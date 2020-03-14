@@ -48,9 +48,10 @@ NSString *retrievableColumns;
 
 - (void)playStatusChanged:(NSNotification *)notification
 {
-    //_isPlaying = ([_playqueue anyThingPlaying]);
+    _isPlaying = ([_playqueue anyThingPlaying]);
     _playPauseButton.highlighted = _isPlaying;
 }
+
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
     [[NSNotificationCenter defaultCenter]removeObserver:self];
