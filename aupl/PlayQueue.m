@@ -534,7 +534,7 @@ NSString *timePrint(NSTimeInterval secs)
 {
     NSPasteboard* pboard = [info draggingPasteboard];
     NSData* rowData = [pboard dataForType:AUPLQIndexTypePasteboardType];
-    NSIndexSet* rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowData];
+    NSIndexSet* rowIndexes = [NSKeyedUnarchiver unarchivedObjectOfClass:[NSIndexSet class] fromData:rowData error:nil];
     [_queue moveObjectsAtIndexes:rowIndexes toIndex:row];
     [aTableView reloadData];
     return YES;
