@@ -16,6 +16,7 @@
     {
         _trackIndex = idx;
         _state = AUP_NOSTATUS;
+		volume = 0.5;
     }
     return self;
 }
@@ -24,8 +25,8 @@
     NSURL *url = [NSURL fileURLWithPath:path];
     NSError *err;
     self.player = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&err];
-    self.player.delegate = self;
 	self.player.volume = [self volume];
+    self.player.delegate = self;
     _state = AUP_PREPARING;
     [self.player prepareToPlay];
     _state = AUP_PREPARED;
@@ -56,8 +57,8 @@
     NSError *err;
     self.player = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&err];
     self.player.delegate = self;
-    if (vol != 1.0)
-        self.player.volume = vol;
+	volume = vol;
+	self.player.volume = vol;
     [self.player play];
     _state = AUP_PLAYING;
 }
@@ -89,12 +90,13 @@
 
 -(void)setVolume:(CGFloat)f
 {
-    self.player.volume = f;
+    volume = f;
+    self.player.volume = volume;
 }
 
 -(CGFloat)volume
 {
-    return self.player.volume;
+    return volume;
 }
 
 -(NSTimeInterval)time

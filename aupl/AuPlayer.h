@@ -26,7 +26,9 @@ enum
 @end
 
 @interface AuPlayer : NSObject<AVAudioPlayerDelegate>
-
+{
+	float volume;
+}
 @property (retain)AVAudioPlayer *player;
 @property NSInteger trackIndex;
 @property (weak) id<PlayerDelegate> delegate;
