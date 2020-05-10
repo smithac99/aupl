@@ -60,6 +60,10 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
     }
 }
 
+-(void)playStatusChanged:(id)sender
+{
+	
+}
 -(void)resetLabels
 {
     [self.mainSongLabel setStringValue:@""];

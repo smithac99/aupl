@@ -25,6 +25,7 @@
     NSError *err;
     self.player = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&err];
     self.player.delegate = self;
+	self.player.volume = [self volume];
     _state = AUP_PREPARING;
     [self.player prepareToPlay];
     _state = AUP_PREPARED;
