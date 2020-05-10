@@ -10,6 +10,12 @@
 
 @implementation EventView
 
+-(void)awakeFromNib
+{
+	[super awakeFromNib];
+	[controlView setHidden:YES];
+	[self addTrackingArea:[[NSTrackingArea alloc]initWithRect:[self bounds] options:NSTrackingMouseEnteredAndExited|NSTrackingActiveAlways owner:self userInfo:nil]];
+}
 - (void)drawRect:(NSRect)dirtyRect
 {
     [super drawRect:dirtyRect];
@@ -18,4 +24,12 @@
 
 }
 
+-(void)mouseEntered:(NSEvent *)event
+{
+	[controlView setHidden:NO];
+}
+-(void)mouseExited:(NSEvent *)event
+{
+	[controlView setHidden:YES];
+}
 @end
