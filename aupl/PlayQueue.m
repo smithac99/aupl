@@ -55,7 +55,7 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
         self.volume = 1;
         [self.volSlider setFloatValue:self.volume];
         [_queueTableView registerForDraggedTypes:@[AUPLQIndexTypePasteboardType]];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playStatusChanged:) name:NSUserDefaultsDidChangeNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(defaultsChanged:) name:NSUserDefaultsDidChangeNotification object:nil];
         [super awakeFromNib];
     }
 }

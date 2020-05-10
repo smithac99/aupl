@@ -788,6 +788,8 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 
 -(NSArray*)provideMoreTracks:(NSInteger)num
 {
+    if (self.db == nil)
+        return @[];
     if ([self isRandom])
     {
         __block NSArray *a;
