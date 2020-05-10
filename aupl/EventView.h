@@ -11,7 +11,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface EventView : NSView
-
+{
+	IBOutlet NSView *controlView;
+}
 @end
 
 NS_ASSUME_NONNULL_END
