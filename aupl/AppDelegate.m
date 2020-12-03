@@ -460,6 +460,7 @@ NSString *retrievableColumns;
 
     });
 }
+
 void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 {
 	if (i2 < i1)
@@ -690,6 +691,11 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
         if (_playqueue.currentTrack && [[_playqueue player]isPlaying])
         {
             _playqueue.stopAtEndOfThisTrack = true;
+            NSControl *c = sender;
+            NSButtonCell *bc = [c cell];
+            //[bc setBackgroundColor:[NSColor redColor]];
+            [bc setTransparent:YES];
+            [[c layer]setBackgroundColor:[[NSColor colorWithRed:1 green:0.7 blue:0.7 alpha:1]CGColor]];
         }
         return;
     }

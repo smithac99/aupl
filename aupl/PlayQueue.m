@@ -16,6 +16,7 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
 {
     NSTimeInterval dispatchToken;
     BOOL inited;
+    bool draggingSlider;
 }
 @property (weak) IBOutlet NSTextField *mainSongLabel;
 @property (weak) IBOutlet NSTextField *mainArtistAlbumLabel;
@@ -23,6 +24,7 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
 @property (weak) IBOutlet NSTextField *toGoLabel;
 @property (weak) IBOutlet NSSlider *timeSlider;
 @property (weak) IBOutlet NSTableView *queueTableView;
+@property (weak) IBOutlet NSButton *playPauseButton;
 
 @property (weak) IBOutlet NSTableView *historyTableView;
 
@@ -183,6 +185,32 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
     [_delegate trackStatsUpdated:td];
 }
 
+- (IBAction)timeSliderHit:(id)sender
+{
+    NSEvent *event = [[NSApplication sharedApplication] currentEvent];
+    BOOL startingDrag = event.type == NSEventTypeLeftMouseDown;
+    BOOL endingDrag = event.type == NSEventTypeLeftMouseUp;
+    //BOOL dragging = event.type == NSEventTypeLeftMouseDragged;
+    if (startingDrag)
+        draggingSlider = YES;
+    else if (endingDrag)
+        draggingSlider = NO;
+    if (self.currentTrack == nil)
+        return;
+    float f = [sender floatValue] / 100;
+    NSMutableDictionary *md = self.currentTrack;
+    AuPlayer *pl = md[@"player"];
+    if (pl)
+    {
+        float dur = [pl duration];
+        if (dur > 0)
+        {
+            float pos = f * dur;
+            [pl setTime:pos];
+        }
+    }
+
+}
 
 -(void)notifyPlayStatusChange
 {
@@ -238,9 +266,16 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
 {
     if ([_historyQueue count] > 0)
     {
-        NSMutableDictionary *md = _historyQueue[0];
         if (self.currentTrack)
+        {
+            NSMutableDictionary *md = self.currentTrack;
+            AuPlayer *player = md[@"player"];
+            if (player != nil)
+                [player stopPlaying];
             [_queue insertObject:self.currentTrack atIndex:0];
+        }
+        NSMutableDictionary *md = _historyQueue[0];
+        [_historyQueue removeObjectAtIndex:0];
         self.currentTrack = md;
         [self startPlayingCurrentTrack];
         [_queueTableView reloadData];
@@ -256,6 +291,7 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
         if ([pl time] > 3)
         {
             [pl setTime:0];
+            [self updateTimeLabels];
             return YES;
         }
     }
@@ -305,6 +341,9 @@ NSString *AUPLQIndexTypePasteboardType = @"auplqidx";
     }
     else
     {
+        NSButtonCell *bc = [self.playPauseButton cell];
+        [bc setTransparent:NO];
+        [[self.playPauseButton layer]setBackgroundColor:[[NSColor clearColor]CGColor]];
         [self moveCurrentToHistory];
         [self updateLabelsEtc];
         self.stopAtEndOfThisTrack = NO;
@@ -348,7 +387,8 @@ NSString *timePrint(NSTimeInterval secs)
         durationSecs = [n integerValue];
     NSTimeInterval cur = [player time ];
     NSTimeInterval en = durationSecs - cur;
-    [self.timeSlider setFloatValue:(cur/durationSecs) * [self.timeSlider maxValue]];
+    if (!draggingSlider)
+        [self.timeSlider setFloatValue:(cur/durationSecs) * [self.timeSlider maxValue]];
     [self.elapsedLabel setStringValue:timePrint(cur)];
     [self.toGoLabel setStringValue:timePrint(-en)];
 
@@ -407,8 +447,6 @@ NSString *timePrint(NSTimeInterval secs)
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-    if (rowIndex < 0 || rowIndex >= [_queue count])
-        return nil;
     if ([[tableColumn identifier]isEqual:@"queue"])
     {
         if (rowIndex < 0 || rowIndex >= [_queue count])

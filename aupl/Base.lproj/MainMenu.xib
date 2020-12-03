@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -29,6 +29,7 @@
                 <outlet property="historyTableView" destination="vyI-eE-Tge" id="SVf-wI-8EG"/>
                 <outlet property="mainArtistAlbumLabel" destination="pM5-lQ-Pdl" id="Hcq-AX-ajt"/>
                 <outlet property="mainSongLabel" destination="6Qd-oz-YDm" id="7YI-E0-trp"/>
+                <outlet property="playPauseButton" destination="lNO-YJ-Osj" id="mDa-XK-zTF"/>
                 <outlet property="queueTableView" destination="VMo-76-n4j" id="Ewj-VG-hIp"/>
                 <outlet property="timeSlider" destination="ye2-VQ-2kE" id="bO1-VJ-hWx"/>
                 <outlet property="toGoLabel" destination="zas-hH-I30" id="eu5-4d-IWu"/>
@@ -817,11 +818,11 @@
                     <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6FO-Jy-Nxd">
                         <rect key="frame" x="20" y="20" width="612" height="401"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <clipView key="contentView" ambiguous="YES" id="P7A-lm-1Ho">
+                        <clipView key="contentView" id="P7A-lm-1Ho">
                             <rect key="frame" x="1" y="0.0" width="610" height="400"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
-                                <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" typeSelect="NO" autosaveName="_maintable" headerView="2fm-4R-0tL" id="ktF-Am-yHD">
+                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" typeSelect="NO" autosaveName="_maintable" headerView="2fm-4R-0tL" id="ktF-Am-yHD">
                                     <rect key="frame" x="0.0" y="0.0" width="610" height="375"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
@@ -831,7 +832,6 @@
                                     <tableColumns>
                                         <tableColumn identifier="artist" width="116" minWidth="40" maxWidth="1000" id="cUP-IE-XTt">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Artist">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -845,7 +845,6 @@
                                         </tableColumn>
                                         <tableColumn identifier="album" width="119" minWidth="40" maxWidth="1000" id="gws-fd-iMJ">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Album">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
@@ -859,7 +858,6 @@
                                         </tableColumn>
                                         <tableColumn identifier="track" width="88" minWidth="10" maxWidth="3.4028234663852886e+38" id="jFY-GT-LeQ">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Track">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </tableHeaderCell>
@@ -873,7 +871,6 @@
                                         </tableColumn>
                                         <tableColumn identifier="created" width="111" minWidth="10" maxWidth="3.4028234663852886e+38" id="fn5-xc-uOb">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Created">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </tableHeaderCell>
@@ -887,7 +884,6 @@
                                         </tableColumn>
                                         <tableColumn identifier="lastPlayed" width="96" minWidth="10" maxWidth="3.4028234663852886e+38" id="Snu-mQ-eg3">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Last Played">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </tableHeaderCell>
@@ -901,7 +897,6 @@
                                         </tableColumn>
                                         <tableColumn identifier="timesPlayed" width="62" minWidth="10" maxWidth="3.4028234663852886e+38" id="fgw-Yb-efY">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Played">
-                                                <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </tableHeaderCell>
@@ -966,13 +961,17 @@
                             <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ye2-VQ-2kE">
                                 <rect key="frame" x="47" y="78" width="180" height="13"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <sliderCell key="cell" controlSize="mini" state="on" alignment="left" maxValue="100" tickMarkPosition="above" sliderType="linear" id="1Dz-oB-ZT1"/>
+                                <sliderCell key="cell" controlSize="mini" state="on" alignment="left" maxValue="100" tickMarkPosition="above" sliderType="linear" id="1Dz-oB-ZT1">
+                                    <connections>
+                                        <action selector="timeSliderHit:" target="4cf-9y-eDj" id="R5s-5I-q2H"/>
+                                    </connections>
+                                </sliderCell>
                             </slider>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iAa-Qo-VOk">
                                 <rect key="frame" x="4" y="77" width="37" height="14"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" alignment="right" title="0:00" id="blQ-My-jV6">
-                                    <font key="font" metaFont="label" size="11"/>
+                                    <font key="font" metaFont="message" size="11"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -981,7 +980,7 @@
                                 <rect key="frame" x="233" y="77" width="37" height="14"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" alignment="left" title="0:00" id="ybm-Ew-Zjc">
-                                    <font key="font" metaFont="label" size="11"/>
+                                    <font key="font" metaFont="message" size="11"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -1019,7 +1018,7 @@
                                             <action selector="prevHit:" target="Voe-Tx-rLC" id="csg-zW-8gv"/>
                                         </connections>
                                     </button>
-                                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lNO-YJ-Osj">
+                                    <button wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lNO-YJ-Osj">
                                         <rect key="frame" x="34" y="0.0" width="32" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarPlayTemplate" imagePosition="overlaps" alignment="center" alternateImage="NSTouchBarPauseTemplate" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Xdw-LH-sLs">
@@ -1054,18 +1053,18 @@
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Queue" identifier="" id="tgk-wR-tAw">
-                                <view key="view" ambiguous="YES" id="LNm-8X-7jK">
+                                <view key="view" id="LNm-8X-7jK">
                                     <rect key="frame" x="10" y="33" width="270" height="249"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="45" horizontalPageScroll="10" verticalLineScroll="45" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="led-FB-OQ7">
                                             <rect key="frame" x="-3" y="1" width="276" height="260"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <clipView key="contentView" ambiguous="YES" id="SmP-tg-BLI">
+                                            <clipView key="contentView" id="SmP-tg-BLI">
                                                 <rect key="frame" x="1" y="0.0" width="274" height="259"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" rowHeight="43" rowSizeStyle="automatic" headerView="Dlr-h1-Vkr" viewBased="YES" floatsGroupRows="NO" id="VMo-76-n4j">
+                                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" rowHeight="43" rowSizeStyle="automatic" headerView="Dlr-h1-Vkr" viewBased="YES" floatsGroupRows="NO" id="VMo-76-n4j">
                                                         <rect key="frame" x="0.0" y="0.0" width="274" height="234"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
@@ -1074,7 +1073,6 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="queue" width="267" minWidth="40" maxWidth="1000" id="FSC-br-h6P">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1166,7 +1164,6 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="history" width="271" minWidth="40" maxWidth="1000" id="hI7-ja-FsT">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1181,14 +1178,18 @@
                                                                         <rect key="frame" x="1" y="1" width="271" height="73"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
-                                                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="lkN-v8-19n">
-                                                                                <rect key="frame" x="3" y="56" width="17" height="17"/>
+                                                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="lkN-v8-19n">
+                                                                                <rect key="frame" x="0.0" y="41" width="32" height="32"/>
+                                                                                <constraints>
+                                                                                    <constraint firstAttribute="height" constant="32" id="K20-Va-3Uo"/>
+                                                                                    <constraint firstAttribute="width" constant="32" id="MKy-aS-jiq"/>
+                                                                                </constraints>
                                                                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSActionTemplate" id="FkK-Oc-8og"/>
                                                                             </imageView>
-                                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" tag="2" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xuj-uN-nni">
-                                                                                <rect key="frame" x="25" y="56" width="246" height="17"/>
+                                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" tag="2" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xuj-uN-nni">
+                                                                                <rect key="frame" x="37" y="56" width="90" height="17"/>
                                                                                 <constraints>
-                                                                                    <constraint firstAttribute="width" constant="242" id="JEq-OH-xsr"/>
+                                                                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="242" id="JEq-OH-xsr"/>
                                                                                 </constraints>
                                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="LHO-0O-gPV">
                                                                                     <font key="font" metaFont="systemSemibold" size="14"/>
@@ -1196,8 +1197,8 @@
                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                 </textFieldCell>
                                                                             </textField>
-                                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" tag="3" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iFE-Q8-H1M">
-                                                                                <rect key="frame" x="25" y="18" width="246" height="35"/>
+                                                                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" tag="3" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iFE-Q8-H1M">
+                                                                                <rect key="frame" x="37" y="38" width="90" height="15"/>
                                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="2lJ-lp-hLx">
                                                                                     <font key="font" metaFont="cellTitle"/>
                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1219,11 +1220,12 @@
                                                                         </subviews>
                                                                         <constraints>
                                                                             <constraint firstItem="Xuj-uN-nni" firstAttribute="leading" secondItem="lkN-v8-19n" secondAttribute="trailing" constant="7" id="6A4-w1-aY7"/>
+                                                                            <constraint firstItem="lkN-v8-19n" firstAttribute="leading" secondItem="s7B-DE-cwy" secondAttribute="leading" id="8cJ-xH-Jnd"/>
                                                                             <constraint firstItem="C26-GQ-cFG" firstAttribute="top" secondItem="Xuj-uN-nni" secondAttribute="bottom" constant="36" id="AOu-Zc-kYF"/>
-                                                                            <constraint firstItem="Xuj-uN-nni" firstAttribute="bottom" secondItem="lkN-v8-19n" secondAttribute="bottom" id="B0S-Op-Nf4"/>
                                                                             <constraint firstItem="Xuj-uN-nni" firstAttribute="trailing" secondItem="iFE-Q8-H1M" secondAttribute="trailing" id="F0i-JP-VwY"/>
-                                                                            <constraint firstAttribute="trailing" secondItem="Xuj-uN-nni" secondAttribute="trailing" constant="2" id="GoD-8h-VwH"/>
+                                                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="lkN-v8-19n" secondAttribute="trailing" constant="2" id="J1b-3Z-yEV"/>
                                                                             <constraint firstAttribute="trailing" secondItem="C26-GQ-cFG" secondAttribute="trailing" constant="3" id="ONB-Fk-Z96"/>
+                                                                            <constraint firstItem="lkN-v8-19n" firstAttribute="top" secondItem="s7B-DE-cwy" secondAttribute="top" id="QCP-I5-BvB"/>
                                                                             <constraint firstItem="Xuj-uN-nni" firstAttribute="top" secondItem="lkN-v8-19n" secondAttribute="top" id="U3b-QI-6tQ"/>
                                                                             <constraint firstAttribute="bottom" secondItem="C26-GQ-cFG" secondAttribute="bottom" constant="3" id="Yg1-S5-LFf"/>
                                                                             <constraint firstItem="Xuj-uN-nni" firstAttribute="leading" secondItem="iFE-Q8-H1M" secondAttribute="leading" id="kBg-zX-Mbl"/>
