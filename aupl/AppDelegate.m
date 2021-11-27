@@ -22,6 +22,7 @@ NSString *retrievableColumns;
 {
     NSInteger lastProvidedIndex;
     NSMutableArray *queuedTracks;
+    NSString *searchFieldString;
 }
 @property NSString *sortColumn;
 @property BOOL sortDescending;
@@ -500,9 +501,8 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 	return nil;
 }
 
--(void)retrieveIndicesSearch:(NSString*)search
+-(NSString*)searchConditionForSearch:(NSString*)search
 {
-	NSString *st = @"select idx from tracks ";
     NSString *searchString = @"";
     if ([search length] > 0)
     {
@@ -518,8 +518,14 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
             }
         }
         searchString = ms;
-        //searchString = [NSString stringWithFormat:@"where artist like \"%%%%%@%%%%\" or album like \"%%%%%@%%%%\" or track like \"%%%%%@%%%%\"",search,search,search ] ;
     }
+    return searchString;
+}
+
+-(void)retrieveIndicesSearch
+{
+	NSString *st = @"select idx from tracks ";
+    NSString *searchString = [self searchConditionForSearch:searchFieldString];
 	NSString *orderString = [[self columnsOrderBy:self.sortColumn]componentsJoinedByString:@","];
 	NSString *qs = [NSString stringWithFormat:@"%@ %@ order by %@",st,searchString,orderString];
 	sqlite3_stmt *stmt = [self.db prepareQuery:qs withParams:@[]];
@@ -554,12 +560,12 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
     {
         [_entryList removeAllObjects];
         DoOnDatabase(^(DBSQL *db) {
-            [self retrieveIndicesSearch:nil];
+            [self retrieveIndicesSearch];
+        });
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.mainTableView reloadData];
         });
     }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.mainTableView reloadData];
-    });
     return [_entryList count];
 }
 
@@ -825,9 +831,10 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 }
 - (IBAction)searchHit:(id)sender
 {
+    searchFieldString = [sender stringValue];
     [_entryList removeAllObjects];
     DoOnDatabase(^(DBSQL *db) {
-        [self retrieveIndicesSearch:[sender stringValue]];
+        [self retrieveIndicesSearch];
     });
     [_mainTableView reloadData];
 }
