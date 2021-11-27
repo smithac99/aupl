@@ -546,24 +546,30 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 {
 	if (flags & AD_REFRESH_ALL_DATA)
 		[_entryCache removeAllObjects];
-    BOOL shouldFetch = ((flags & AD_REFRESH_ROW_ORDER) != 0);
+    BOOL shouldFetch = ((flags & (AD_REFRESH_ROW_ORDER | AD_REFRESH_RETRIEVE_ROWS)) != 0);
     if (!shouldFetch && (flags & AD_REFRESH_IF_ROW_COUNT_CHANGED))
     {
         __block NSNumber *nrct;
+        NSString *query = [NSString stringWithFormat:@"%@ %@",@"select count(*) from tracks",[self searchConditionForSearch:searchFieldString]];
         DoOnDatabase(^(DBSQL *db) {
-             nrct = [self.db valueFromQuery:@"select count(*) from tracks"];
+             nrct = [self.db valueFromQuery:query];
         });
         int tablect = [nrct intValue];
         shouldFetch = shouldFetch || tablect != [_entryList count];
     }
     if (shouldFetch)
     {
+        NSArray *selectedTrackIndexes = [self selectedTrackIndexes];
         [_entryList removeAllObjects];
         DoOnDatabase(^(DBSQL *db) {
             [self retrieveIndicesSearch];
         });
         dispatch_async(dispatch_get_main_queue(), ^{
+            [self.mainTableView selectRowIndexes:[NSIndexSet indexSet] byExtendingSelection:NO];
             [self.mainTableView reloadData];
+            [self tryAndSelectTrackIndexes:selectedTrackIndexes];
+            if ([selectedTrackIndexes count] > 0)
+                [self.mainTableView scrollRowToVisible:[self.mainTableView selectedRow]];
         });
     }
     return [_entryList count];
@@ -658,6 +664,32 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 }
 #pragma mark -
 
+-(NSArray*)selectedTrackIndexes
+{
+    NSIndexSet *selectedRows = [_mainTableView selectedRowIndexes];
+    return [_entryList objectsAtIndexes:selectedRows];
+}
+
+-(void)tryAndSelectTrackIndexes:(NSArray*)trackIndexes
+{
+    if ([trackIndexes count] == 0)
+    {
+        [_mainTableView selectRowIndexes:[NSIndexSet indexSet] byExtendingSelection:NO];
+        return;
+    }
+    NSSet *indexSet = [NSSet setWithArray:trackIndexes];
+    NSMutableIndexSet *ixs = [NSMutableIndexSet indexSet];
+    NSInteger i = 0;
+    for (NSNumber *n in _entryList)
+    {
+        if ([indexSet containsObject:n])
+        {
+            [ixs addIndex:i];
+        }
+        i++;
+    }
+    [_mainTableView selectRowIndexes:ixs byExtendingSelection:NO];
+}
 -(NSArray*)trackIndexesToPlay
 {
     NSIndexSet *selectedRows = [_mainTableView selectedRowIndexes];
@@ -831,12 +863,16 @@ void swapidxes(NSMutableArray *a,NSInteger i1,NSInteger i2)
 }
 - (IBAction)searchHit:(id)sender
 {
-    searchFieldString = [sender stringValue];
-    [_entryList removeAllObjects];
+    NSString *ss = [sender stringValue];
+    if ([ss isEqualToString:searchFieldString])
+        return;
+    searchFieldString = ss;
+    [self refresh:AD_REFRESH_RETRIEVE_ROWS];
+    /*[_entryList removeAllObjects];
     DoOnDatabase(^(DBSQL *db) {
         [self retrieveIndicesSearch];
     });
-    [_mainTableView reloadData];
+    [_mainTableView reloadData];*/
 }
 
 static void setFields(NSString *ident,NSMutableDictionary *md,char *buffer,char *source,NSInteger maxlen)

@@ -14,10 +14,11 @@ extern NSString *AUPL_PLAY_CHANGED;
 
 enum
 {
-	AD_REFRESH_ALL_DATA = 1,
-    AD_REFRESH_ROW_ORDER,
-	AD_REFRESH_IF_ROW_COUNT_CHANGED,
-	AD_REFRESH_VISIBLE_ROWS
+    AD_REFRESH_ALL_DATA = 1,
+    AD_REFRESH_RETRIEVE_ROWS = 2,
+    AD_REFRESH_ROW_ORDER = 4,
+	AD_REFRESH_IF_ROW_COUNT_CHANGED = 8,
+	AD_REFRESH_VISIBLE_ROWS = 16
 };
 @interface AppDelegate : NSObject <NSApplicationDelegate,NSTableViewDataSource,NSTableViewDelegate,PlayQueueDelegate>
 
