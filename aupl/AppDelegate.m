@@ -346,6 +346,15 @@ NSString *retrievableColumns;
     else
         NSLog(@"search finished");
 }
+- (IBAction)fadeAndNext:(id)sender
+{
+    if (_playqueue.currentTrack && [[_playqueue player]isPlaying])
+    {
+        [[self playqueue]fadeOut:[[self playqueue]volume] / 10 completion:^{
+            [[self playqueue]goToNext];
+        }];
+    }
+}
 
 - (IBAction)fullScan:(id)sender
 {

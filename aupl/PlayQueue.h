@@ -42,6 +42,7 @@
 -(void)pause;
 -(BOOL)anyThingPlaying;
 -(AuPlayer*)player;
+-(void)fadeOut:(float)decrement completion:(void (^) (void))completionBlock;
 
 @end
 

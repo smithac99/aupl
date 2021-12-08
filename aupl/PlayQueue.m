@@ -436,6 +436,24 @@ NSString *timePrint(NSTimeInterval secs)
     [[self player]setVolume:self.volume];
 }
 
+-(void)fadeOut:(float)decrement completion:(void (^) (void))completionBlock
+{
+    float currvol = [[self player]volume];
+    if (currvol <= 0)
+    {
+        if (completionBlock)
+            completionBlock();
+        return;
+    }
+    currvol -= decrement;
+    if (currvol < 0)
+        currvol = 0;
+    [[self player]setVolume:currvol];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self fadeOut:decrement completion:completionBlock];
+    });
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == self.queueTableView)
