@@ -29,7 +29,7 @@ enum
 {
 	float volume;
 }
-@property (retain)AVAudioPlayer *player;
+@property (retain)AVPlayer *player;
 @property NSInteger trackIndex;
 @property (weak) id<PlayerDelegate> delegate;
 @property int state;

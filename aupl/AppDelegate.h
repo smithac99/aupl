@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "DBSQL.h"
 #import "PlayQueue.h"
+@import AVKit;
 
 extern NSString *AUPL_PLAY_CHANGED;
 
@@ -20,7 +21,7 @@ enum
 	AD_REFRESH_IF_ROW_COUNT_CHANGED = 8,
 	AD_REFRESH_VISIBLE_ROWS = 16
 };
-@interface AppDelegate : NSObject <NSApplicationDelegate,NSTableViewDataSource,NSTableViewDelegate,PlayQueueDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate,NSTableViewDataSource,NSTableViewDelegate,PlayQueueDelegate,AVRoutePickerViewDelegate>
 
 @property NSURL *rootURL;
 @property NSMutableArray<NSString*> *directorySearchQueue;

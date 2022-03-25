@@ -16,6 +16,7 @@
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
                 <outlet property="mainTableView" destination="ktF-Am-yHD" id="5EE-h3-ZKr"/>
+                <outlet property="pickerHome" destination="xut-nS-kLG" id="caY-tC-zku"/>
                 <outlet property="playPauseButton" destination="d9d-wg-TQc" id="p19-j4-Dhl"/>
                 <outlet property="playqueue" destination="4cf-9y-eDj" id="bq4-Vu-obX"/>
                 <outlet property="trackCountLabel" destination="zjf-p5-VA6" id="8vd-Uz-eqg"/>
@@ -657,6 +658,10 @@
                             <action selector="volSliderHit:" target="4cf-9y-eDj" id="amm-9Q-Nq7"/>
                         </connections>
                     </slider>
+                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xut-nS-kLG">
+                        <rect key="frame" x="648" y="20" width="67" height="56"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    </customView>
                 </subviews>
             </view>
             <point key="canvasLocation" x="11" y="260"/>

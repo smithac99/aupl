@@ -17,19 +17,35 @@
         _trackIndex = idx;
         _state = AUP_NOSTATUS;
 		volume = 0.5;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playbackEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
     }
     return self;
 }
+
+-(AVPlayer*)playerWithURL:(NSURL*)url
+{
+    AVPlayer *p = [[AVPlayer alloc]initWithURL:url];
+    p.volume = [self volume];
+    p.allowsExternalPlayback = YES;
+    _state = AUP_PREPARED;
+    [p.currentItem addObserver:self forKeyPath:@"status" options:0 context:NULL];
+    return p;
+}
+
+-(void)playbackEnd:(NSNotification*)notif
+{
+    [_delegate track:_trackIndex finishedOK:YES];
+}
+
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
+{
+    //[_delegate track:_trackIndex finishedOK:YES];
+    NSLog(@"status change");
+}
+
 -(void)prepare:(NSString*)path
 {
-    NSURL *url = [NSURL fileURLWithPath:path];
-    NSError *err;
-    self.player = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&err];
-	self.player.volume = [self volume];
-    self.player.delegate = self;
-    _state = AUP_PREPARING;
-    [self.player prepareToPlay];
-    _state = AUP_PREPARED;
+    self.player = [self playerWithURL:[NSURL fileURLWithPath:path]];
 }
 
 -(void)pause
@@ -43,7 +59,7 @@
 
 -(void)play
 {                                           //requires prepare be called first
-    self.player.delegate = self;
+    //self.player.delegate = self;
     [self.player play];
     _state = AUP_PLAYING;
 }
@@ -53,12 +69,7 @@
 {
     if (path == nil)
         return;
-    NSURL *url = [NSURL fileURLWithPath:path];
-    NSError *err;
-    self.player = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&err];
-    self.player.delegate = self;
-	volume = vol;
-	self.player.volume = vol;
+    self.player = [self playerWithURL:[NSURL fileURLWithPath:path]];
     [self.player play];
     _state = AUP_PLAYING;
 }
@@ -67,12 +78,13 @@
 {
     if (![self isPlaying])
         return;
-    [self.player stop];
+    [self.player pause];
     _state = AUP_PAUSED;
 }
+
 -(BOOL)isPlaying
 {
-    return self.player && self.player.isPlaying;
+    return self.player && self.player.rate != 0;
 }
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
@@ -84,7 +96,10 @@
 -(NSTimeInterval)duration
 {
     if (self.player)
-        return self.player.duration;
+    {
+        CMTime cmtime = self.player.currentItem.duration;
+        return CMTimeGetSeconds(cmtime);
+    }
     return 0.0;
 }
 
@@ -101,12 +116,14 @@
 
 -(NSTimeInterval)time
 {
-    return self.player.currentTime;
+    CMTime cmtime = self.player.currentItem.currentTime;
+    return CMTimeGetSeconds(cmtime);
 }
 
 -(void)setTime:(NSTimeInterval)tm
 {
-    self.player.currentTime = tm;
+    CMTime cmtime = CMTimeMakeWithSeconds(tm, 600);
+    [self.player seekToTime:cmtime];
 }
 
 

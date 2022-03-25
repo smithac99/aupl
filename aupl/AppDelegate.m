@@ -8,6 +8,7 @@
 
 
 #import "AppDelegate.h"
+@import AVKit;
 #import <AVFoundation/AVFoundation.h>
 #import <sys/stat.h>
 #import "NSMutableArray+NSMutableArray_Additions.h"
@@ -24,11 +25,14 @@ NSString *retrievableColumns;
     NSMutableArray *queuedTracks;
     NSString *searchFieldString;
 }
+@property (weak) IBOutlet NSView *pickerHome;
 @property NSString *sortColumn;
 @property BOOL sortDescending;
 @property (weak) IBOutlet NSWindow *window;
 @property (weak) IBOutlet NSButton *playPauseButton;
 @property (weak) IBOutlet NSTextField *trackCountLabel;
+@property AVRoutePickerView *routePickerView;
+@property AVRouteDetector *routeDetector;
 @end
 
 @implementation AppDelegate
@@ -45,6 +49,24 @@ NSString *retrievableColumns;
 		self.sortColumn = orderableColumns[0];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playStatusChanged:) name:AUPL_PLAY_CHANGED object:nil];
 	[self chooseRootDirectoryStartAt:nil];
+    _routePickerView = [[AVRoutePickerView alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
+    _routePickerView.delegate = self;
+    [self.pickerHome addSubview:_routePickerView];
+    self.routeDetector = [[AVRouteDetector alloc]init];
+    self.routeDetector.routeDetectionEnabled = YES;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(routesChange:) name:AVRouteDetectorMultipleRoutesDetectedDidChangeNotification object:nil];
+
+}
+
+- (void)routesChange:(NSNotification *)notification
+{
+    if (self.routeDetector.multipleRoutesDetected)
+        NSLog(@"multiple routes detected");
+}
+
+- (void)routePickerViewWillBeginPresentingRoutes:(AVRoutePickerView *)routePickerView
+{
+    routePickerView.player = self.playqueue.player.player;
 }
 
 - (void)playStatusChanged:(NSNotification *)notification
